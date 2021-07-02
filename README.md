@@ -1,5 +1,5 @@
 # DongTai-Plugin-IDEA
-### 项目介绍
+## 项目介绍
 
 “火线～洞态IAST”是一款专为甲方安全人员、甲乙代码审计工程师和0 Day漏洞挖掘人员量身打造的辅助工具，可用于集成devops环境进行漏洞检测、作为代码审计的辅助工具和自动化挖掘0 Day。
 
@@ -12,11 +12,11 @@
 - `agent`为各语言的数据采集端，从安装探针的项目中采集相对应的数据，发送至`DongTai-openapi`服务
 - `DongTai-Plugin-IDEA`用于IDEA启动项目时，更加直观、快速、实时的查看项目漏洞、添加HOOK规则等
 
-#### 应用场景
+### 应用场景
 
 为甲方人员使用IDEA运行项目提供辅助，添加HOOK规则、查看项目漏洞等功能均在IDEA中就可实现。
 
-#### 部署方案
+### 部署方案
 
 1. 下载 DongTai IAST 插件
 
@@ -36,6 +36,6 @@
    - 重启 IDEA
 
 
-#### 文档
+### 文档
 
 - [官方文档](https://hxsecurity.github.io/DongTaiDoc/#/doc/tutorial/plugin)
