@@ -1,0 +1,59 @@
+<idea-plugin>
+  <id>cn.huoxian.dongtai.plugin</id>
+  <name>DongTai IAST</name>
+  <version>1.0</version>
+  <vendor email="niuerzhuang@huoxian.cn" url="http://www.huoxian.cn">huoxian</vendor>
+
+  <description>
+    DongTai IAST plugin Features:It can provide assistance for Party A's personnel to run the project with idea, and add hook rules, view project vulnerabilities and other functions can be realized in idea.
+
+    doc：https://hxsecurity.github.io/DongTaiDoc/#/doc/tutorial/plugin
+
+    HuoXian：http://www.huoxian.cn
+
+    DongTai IAST：https://iast.huoxian.cn
+
+    vulfocus：https://labs.iast.huoxian.cn
+  </description>
+
+  <change-notes>
+  </change-notes>
+
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="173.0"/>
+
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.platform</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+    <notificationGroup id="Custom Notification Group" displayType="BALLOON"/>
+    <executor implementation="cn.huoxian.dongtai.plugin.executor.RunExecutor"/>
+    <programRunner implementation="cn.huoxian.dongtai.plugin.runner.RunCodeRunner"/>
+    <executor implementation="cn.huoxian.dongtai.plugin.executor.DebugExecutor"/>
+    <programRunner implementation="cn.huoxian.dongtai.plugin.runner.DebugCodeRunner"/>
+
+    <toolWindow id="DongTai"
+                secondary="true"
+                anchor="right"
+                factoryClass="cn.huoxian.dongtai.plugin.toolwindow.TaintListWindowFactory" icon="assets/toolwindow.svg">
+    </toolWindow>
+  </extensions>
+
+  <actions>
+    <group id="DongTai IAST" text="DongTai IAST" popup="true" icon="DongTaiPluginIcons.DongTaiAction">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+      <action id="RemoteConfigAction" class="cn.huoxian.dongtai.plugin.action.RemoteConfigAction"
+              text="配置云端" description="RemoteConfigAction">
+      </action>
+    </group>
+    <!-- Add your actions here -->
+    <action id="TaintConfigAction" class="cn.huoxian.dongtai.plugin.action.TaintConfigAction" text="添加 HOOK 规则"
+            description="TaintConfigAction">
+      <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="$Copy"/>
+    </action>
+  </actions>
+  <depends>com.intellij.modules.lang</depends>
+  <depends>com.intellij.modules.java</depends>
+</idea-plugin>
