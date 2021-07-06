@@ -15,7 +15,6 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import static cn.huoxian.dongtai.plugin.dialog.RemoteConfigDialog.isNewToken;
-import static cn.huoxian.dongtai.plugin.util.TaintConstant.*;
 
 /**
  * @author niuerzhuang@huoxian.cn
@@ -33,9 +32,9 @@ public class TaintUtil {
             String osName = System.getProperty("os.name");
             if (MAC_PATTERN.matcher(osName).find()) {
                 String home = System.getProperty("user.home");
-                file = new File(home + CONFIG_FILENAME_MAC);
+                file = new File(home + TaintConstant.CONFIG_FILENAME_MAC);
             } else {
-                file = new File(CONFIG_FILENAME_WINDOWS);
+                file = new File(TaintConstant.CONFIG_FILENAME_WINDOWS);
             }
             if (!file.exists()) {
                 file.createNewFile();
@@ -63,10 +62,10 @@ public class TaintUtil {
             String home = System.getProperty("user.home");
             if (MAC_PATTERN.matcher(osName).find()) {
                 path = new File(home + "/Library/iastagent");
-                file = new File(home + CONFIG_FILENAME_MAC);
+                file = new File(home + TaintConstant.CONFIG_FILENAME_MAC);
             } else {
                 path = new File(home + "/Library/iastagent");
-                file = new File(CONFIG_FILENAME_WINDOWS);
+                file = new File(TaintConstant.CONFIG_FILENAME_WINDOWS);
             }
             if (!path.isDirectory()) {
                 path.mkdirs();
@@ -76,9 +75,9 @@ public class TaintUtil {
             }
             InputStream in;
             if (MAC_PATTERN.matcher(osName).find()) {
-                in = new BufferedInputStream(new FileInputStream(home + CONFIG_FILENAME_MAC));
+                in = new BufferedInputStream(new FileInputStream(home + TaintConstant.CONFIG_FILENAME_MAC));
             } else {
-                in = new BufferedInputStream(new FileInputStream(CONFIG_FILENAME_WINDOWS));
+                in = new BufferedInputStream(new FileInputStream(TaintConstant.CONFIG_FILENAME_WINDOWS));
             }
             Properties p = new Properties();
             p.load(in);
@@ -150,7 +149,7 @@ public class TaintUtil {
                 conn.connect();
                 inputStream = conn.getInputStream();
                 BufferedInputStream bis = new BufferedInputStream(inputStream);
-                fileOut = new FileOutputStream(filePath + AGENT_NAME);
+                fileOut = new FileOutputStream(filePath + TaintConstant.AGENT_NAME);
                 BufferedOutputStream bos = new BufferedOutputStream(fileOut);
                 byte[] buf = new byte[4096];
                 int length = bis.read(buf);
@@ -162,10 +161,10 @@ public class TaintUtil {
                 bis.close();
                 conn.disconnect();
             } catch (Exception e) {
-                notificationError(NOTIFICATION_CONTENT_ERROR_FAILURE);
+                notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
                 RemoteConfigDialog remoteConfigDialog = new RemoteConfigDialog();
                 remoteConfigDialog.pack();
-                remoteConfigDialog.setTitle(NAME_DONGTAI_IAST_RULE);
+                remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
                 remoteConfigDialog.setVisible(true);
             }
         }
@@ -194,9 +193,9 @@ public class TaintUtil {
     public static String os() {
         String osName = System.getProperty("os.name");
         if (MAC_PATTERN.matcher(osName).find()) {
-            return AGENT_PATH_MAC;
+            return TaintConstant.AGENT_PATH_MAC;
         } else {
-            return AGENT_PATH_WINDOWS;
+            return TaintConstant.AGENT_PATH_WINDOWS;
         }
     }
 }

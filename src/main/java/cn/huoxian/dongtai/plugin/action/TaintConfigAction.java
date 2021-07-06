@@ -1,6 +1,7 @@
 package cn.huoxian.dongtai.plugin.action;
 
 import cn.huoxian.dongtai.plugin.dialog.TaintConfigDialog;
+import cn.huoxian.dongtai.plugin.util.TaintConstant;
 import cn.huoxian.dongtai.plugin.util.TaintUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -9,11 +10,6 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.compiled.ClsFileImpl;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
-
-import java.util.Objects;
-
-import static cn.huoxian.dongtai.plugin.util.TaintConstant.NAME_DONGTAI_IAST_RULE_ADD;
-import static cn.huoxian.dongtai.plugin.util.TaintConstant.NOTIFICATION_CONTENT_WARNING_METHOD;
 
 /**
  * @author niuerzhuang@huoxian.cn
@@ -41,10 +37,10 @@ public class TaintConfigAction extends AnAction {
             TaintConfigDialog dialog = new TaintConfigDialog(method, classKind);
             dialog.pack();
             dialog.setSize(700, 300);
-            dialog.setTitle(NAME_DONGTAI_IAST_RULE_ADD);
+            dialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE_ADD);
             dialog.setVisible(true);
         } catch (Exception ignore) {
-            TaintUtil.notificationWarning(NOTIFICATION_CONTENT_WARNING_METHOD);
+            TaintUtil.notificationWarning(TaintConstant.NOTIFICATION_CONTENT_WARNING_METHOD);
         }
     }
 
@@ -90,18 +86,18 @@ public class TaintConfigAction extends AnAction {
     }
 
     private String getParameterTypes(PsiMethod psiMethod) {
-        StringBuilder str = new StringBuilder();
+        StringBuilder parameterTypesStr = new StringBuilder();
         PsiType[] parameterTypes = psiMethod.getSignature(PsiSubstitutor.EMPTY).getParameterTypes();
         for (PsiType psiType : parameterTypes
         ) {
-            str.append(psiType.getInternalCanonicalText()).append(",");
+            parameterTypesStr.append(psiType.getInternalCanonicalText()).append(",");
         }
         String superfluousWords = ",";
-        if (str.lastIndexOf(superfluousWords) != -1) {
-            str.deleteCharAt(str.lastIndexOf(",")).append(")");
+        if (parameterTypesStr.lastIndexOf(superfluousWords) != -1) {
+            parameterTypesStr.deleteCharAt(parameterTypesStr.lastIndexOf(",")).append(")");
         } else {
-            str.append(")");
+            parameterTypesStr.append(")");
         }
-        return String.valueOf(str);
+        return String.valueOf(parameterTypesStr);
     }
 }

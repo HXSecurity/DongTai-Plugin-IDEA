@@ -2,6 +2,7 @@ package cn.huoxian.dongtai.plugin.runner;
 
 import cn.huoxian.dongtai.plugin.dialog.RemoteConfigDialog;
 import cn.huoxian.dongtai.plugin.executor.RunExecutor;
+import cn.huoxian.dongtai.plugin.util.TaintConstant;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.impl.DefaultJavaProgramRunner;
@@ -11,8 +12,8 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.ui.RunContentDescriptor;
 import org.jetbrains.annotations.NotNull;
 
-import static cn.huoxian.dongtai.plugin.util.TaintConstant.*;
-import static cn.huoxian.dongtai.plugin.util.TaintUtil.*;
+import static cn.huoxian.dongtai.plugin.util.TaintUtil.downloadAgent;
+import static cn.huoxian.dongtai.plugin.util.TaintUtil.notificationWarning;
 
 /**
  * @author niuerzhuang@huoxian.cn
@@ -38,18 +39,18 @@ public class RunCodeRunner extends DefaultJavaProgramRunner {
     @Override
     protected RunContentDescriptor doExecute(@NotNull RunProfileState state, @NotNull ExecutionEnvironment env) throws ExecutionException {
         try {
-            downloadAgent(AGENT_URL, AGENT_PATH);
+            downloadAgent(TaintConstant.AGENT_URL, TaintConstant.AGENT_PATH);
         } catch (Exception e) {
-            notificationWarning(NOTIFICATION_CONTENT_ERROR_FAILURE);
+            notificationWarning(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
             RemoteConfigDialog remoteConfigDialog = new RemoteConfigDialog();
             remoteConfigDialog.pack();
-            remoteConfigDialog.setTitle(NAME_DONGTAI_IAST_RULE);
+            remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
             remoteConfigDialog.setVisible(true);
         }
         String name = env.getProject().getName();
         JavaParameters parameters = ((JavaCommandLine) state).getJavaParameters();
         ParametersList parametersList = parameters.getVMParametersList();
-        parametersList.add("-javaagent:" + AGENT_PATH + "agent.jar");
+        parametersList.add("-javaagent:" + TaintConstant.AGENT_PATH + "agent.jar");
         parametersList.add("-Dproject.name=" + name);
         return super.doExecute(state, env);
     }
