@@ -5,15 +5,18 @@
   <vendor email="niuerzhuang@huoxian.cn" url="http://www.huoxian.cn">huoxian</vendor>
 
   <description>
-    DongTai IAST plugin Features:It can provide assistance for Party A's personnel to run the project with idea, and add hook rules, view project vulnerabilities and other functions can be realized in idea.
-
-    doc：https://hxsecurity.github.io/DongTaiDoc/#/doc/tutorial/plugin
-
-    HuoXian：http://www.huoxian.cn
-
-    DongTai IAST：https://iast.huoxian.cn
-
-    vulfocus：https://labs.iast.huoxian.cn
+    <![CDATA[
+      <p>DongTai IAST plugin Features:It can provide assistance for Party A's personnel to run the project with idea, and add hook rules, view project vulnerabilities and other functions can be realized in idea.Please click the official document to use the plugin.</p>
+      <br/>
+      <p>See also:</p>
+      <ul>
+        <li><a href="https://hxsecurity.github.io/DongTaiDoc/#/doc/tutorial/plugin">official document</a></li>
+        <li><a href="https://github.com/HXSecurity/DongTai-Plugin-IDEA">GitHub repository</a></li>
+        <li><a href="http://www.huoxian.cn/">huoxian</a></li>
+        <li><a href="https://iast.huoxian.cn/">iast</a></li>
+        <li><a href="https://labs.iast.huoxian.cn/">vulfocus</a></li>
+      </ul>
+    ]]>
   </description>
 
   <change-notes>
