@@ -5,15 +5,19 @@
     <vendor email="niuerzhuang@huoxian.cn" url="http://www.huoxian.cn">huoxian</vendor>
 
     <description><![CDATA[
-        <p>    DongTai IAST plugin Features:It can provide assistance for Party A's personnel to run the project with idea, and add hook rules, view project vulnerabilities and other functions can be realized in idea. </p>
+        <p>    Dongtai-plugin-idea is an IDEA plug-in developed by DongTai team for Java Web application developers. This plugin provides functions such as vulnerability detection and code audit during application development, enabling developers to find application vulnerabilities more intuitively, quickly and in real time during application development. Specific functions of the plugin:</p>
+        <br/>
+        <ul>
+            <li>1. Detecting application vulnerabilities</li>
+            <li>2. Show vulnerability list</li>
+            <li>3. Add HOOK rules quickly</li>
+        </ul>
         <br/>
         <p>See also:</p>
         <ul>
            <li><a href="https://github.com/HXSecurity/DongTai-Plugin-IDEA">GitHub repository</a></li>
-           <li><a href="https://hxsecurity.github.io/DongTaiDoc/#/doc/tutorial/plugin">documentation</a></li>
-           <li><a href="http://www.huoxian.cn">huoxian</a></li>
+           <li><a href="https://hxsecurity.github.io/DongTai-Doc/#/en-us/doc/tutorial/plugin">documentation</a></li>
            <li><a href="https://iast.huoxian.cn">iast</a></li>
-           <li><a href="https://labs.iast.huoxian.cn">vulfocus</a></li>
         </ul>
     ]]></description>
 
