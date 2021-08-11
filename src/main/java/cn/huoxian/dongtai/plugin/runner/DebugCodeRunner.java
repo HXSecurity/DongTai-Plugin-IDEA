@@ -53,7 +53,6 @@ public class DebugCodeRunner extends GenericDebuggerRunner {
         ParametersList parametersList = parameters.getVMParametersList();
         parametersList.add("-javaagent:" + TaintConstant.AGENT_PATH + "agent.jar");
         parametersList.add("-Dproject.name=" + name);
-        parametersList.add("-Diast.server.mode=local");
         return super.doExecute(state, env);
     }
 }
