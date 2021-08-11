@@ -61,7 +61,7 @@ public interface TaintConstant {
 
     String URL = TaintUtil.fixUrl();
 
-    String AGENT_URL = URL + "/api/v1/agent/download?url=" + URL + "&jdk.version=Java%201.8";
+    String AGENT_URL = URL + "/api/v1/agent/download?url=" + URL + "&language=java";
 
     String AGENT_PATH_MAC = PROPERTY + "/Library/iastagent/";
 
