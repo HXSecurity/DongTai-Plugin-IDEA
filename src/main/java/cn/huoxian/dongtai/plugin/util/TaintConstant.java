@@ -1,6 +1,7 @@
 package cn.huoxian.dongtai.plugin.util;
 
 import javax.swing.table.DefaultTableModel;
+import java.io.File;
 
 /**
  * @author niuerzhuang@huoxian.cn
@@ -21,9 +22,7 @@ public interface TaintConstant {
 
     String TAINTS_COUNT_API_GET = "/api/v1/plugin/vuln/count";
 
-    String CONFIG_FILENAME_WINDOWS = PROPERTY + "/Library/iastagent/DongTaiConfig.properties";
-
-    String CONFIG_FILENAME_MAC = "/Library/iastagent/DongTaiConfig.properties";
+    String CONFIG_FILENAME = PROPERTY + File.separator +"Library"+File.separator+"iastagent"+File.separator+"DongTaiConfig.properties";
 
     String RULE_STAIN_SOURCE = "污点源方法规则";
 
@@ -61,19 +60,15 @@ public interface TaintConstant {
 
     String URL = TaintUtil.fixUrl();
 
-    String AGENT_URL = URL + "/api/v1/agent/download?url=" + URL + "&jdk.version=Java%201.8";
+    String AGENT_URL = URL + "/api/v1/agent/download?url=" + URL + "&language=java";
 
-    String AGENT_PATH_MAC = PROPERTY + "/Library/iastagent/";
+    String IAST_AGENT_PATH = PROPERTY + File.separator +"Library"+File.separator+"iastagent";
 
-    String AGENT_PATH_WINDOWS = PROPERTY + "/Library/iastagent/";
+    String AGENT_CONFIG_PATH = IAST_AGENT_PATH + File.separator + "config"+File.separator+"iast.properties";
 
-    String DEFAULT_URL = "https://iast.huoxian.cn";
+    String DEFAULT_URL = "https://iast.io";
 
-    String DEFAULT_AGENT_URL = "http://openapi.iast.huoxian.cn:8000";
-
-    String AGENT_CONFIG_PATH_MAC = AGENT_PATH_MAC + "config/iast.properties";
-
-    String AGENT_CONFIG_PATH_WINDOWS = AGENT_PATH_WINDOWS + "config/iast.properties";
+    String DEFAULT_AGENT_URL = "https://openapi.iast.io";
 
     String AGENT_VERSION_VALUE = "v1.0.0";
 
@@ -81,9 +76,7 @@ public interface TaintConstant {
 
     DefaultTableModel TABLE_MODEL = new DefaultTableModel(null, COLUMN_NAME);
 
-    String TAINT_DETAIL = "https://iast.huoxian.cn/vuln/vulnDetail/1/";
-
-    String AGENT_PATH = TaintUtil.os();
+    String TAINT_DETAIL = "/vuln/vulnDetail/1/";
 
     String REQUEST_JSON_ERROR_STATUS = "202";
 

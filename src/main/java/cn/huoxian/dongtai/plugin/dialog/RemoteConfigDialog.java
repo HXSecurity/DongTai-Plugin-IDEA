@@ -1,13 +1,15 @@
 package cn.huoxian.dongtai.plugin.dialog;
 
+import cn.huoxian.dongtai.plugin.util.TaintConstant;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static cn.huoxian.dongtai.plugin.util.TaintConstant.*;
-import static cn.huoxian.dongtai.plugin.util.TaintUtil.*;
+import static cn.huoxian.dongtai.plugin.util.TaintUtil.config;
+import static cn.huoxian.dongtai.plugin.util.TaintUtil.configWrite;
 
 /**
  * @author niuerzhuang@huoxian.cn
@@ -18,7 +20,7 @@ public class RemoteConfigDialog extends JDialog {
     private JButton buttonCancel;
     private JTextField tokenTextArea;
     private JTextField urlTextField;
-    private JTextField agentUrl;
+    private JTextField openapi;
 
     public static boolean isNewToken = false;
 
@@ -29,13 +31,13 @@ public class RemoteConfigDialog extends JDialog {
         setCenter();
         String agentUrlStr = config("AGENTURL");
         if (agentUrlStr == null || "".equals(agentUrlStr)) {
-            agentUrl.setText(DEFAULT_AGENT_URL);
+            openapi.setText(TaintConstant.DEFAULT_AGENT_URL);
         } else {
-            agentUrl.setText(agentUrlStr);
+            openapi.setText(agentUrlStr);
         }
         String urlStr = config("URL");
         if (urlStr == null || "".equals(urlStr)) {
-            urlTextField.setText(DEFAULT_URL);
+            urlTextField.setText(TaintConstant.DEFAULT_URL);
         } else {
             urlTextField.setText(urlStr);
         }
@@ -45,12 +47,12 @@ public class RemoteConfigDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 String url = urlTextField.getText();
                 String token = tokenTextArea.getText();
-                String agent = agentUrl.getText();
-                Map<String, String> map = new HashMap<>(2);
-                map.put("URL", url);
-                map.put("TOKEN", token);
-                map.put("AGENTURL", agent);
-                configWrite(map);
+                String agent = openapi.getText();
+                Map<String, String> remoteConfig = new HashMap<>(2);
+                remoteConfig.put("URL", url);
+                remoteConfig.put("TOKEN", token);
+                remoteConfig.put("AGENTURL", agent);
+                configWrite(remoteConfig);
                 onOK();
             }
         });
@@ -88,9 +90,9 @@ public class RemoteConfigDialog extends JDialog {
      * 将 Dialog 居中
      */
     public void setCenter() {
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = DIALOG_SIZE_WIDTH;
-        int height = DIALOG_SIZE_HEIGHT;
-        setBounds((d.width - width) / 2, (d.height - height) / 2, width, height);
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        int width = TaintConstant.DIALOG_SIZE_WIDTH;
+        int height = TaintConstant.DIALOG_SIZE_HEIGHT;
+        setBounds((dimension.width - width) / 2, (dimension.height - height) / 2, width, height);
     }
 }

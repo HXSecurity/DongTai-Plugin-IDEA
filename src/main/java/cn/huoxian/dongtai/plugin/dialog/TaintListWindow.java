@@ -5,6 +5,7 @@ import cn.huoxian.dongtai.plugin.pojo.ResponseTaintCount;
 import cn.huoxian.dongtai.plugin.pojo.Taint;
 import cn.huoxian.dongtai.plugin.pojo.TaintConvert;
 import cn.huoxian.dongtai.plugin.util.GetJson;
+import cn.huoxian.dongtai.plugin.util.TaintConstant;
 import cn.huoxian.dongtai.plugin.util.TaintUtil;
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
@@ -20,9 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static cn.huoxian.dongtai.plugin.util.TaintConstant.TABLE_MODEL;
-import static cn.huoxian.dongtai.plugin.util.TaintConstant.TAINT_DETAIL;
 
 /**
  * @author niuerzhuang@huoxian.cn
@@ -92,7 +90,7 @@ public class TaintListWindow {
     }
 
     public void init() {
-        contentTable.setModel(TABLE_MODEL);
+        contentTable.setModel(TaintConstant.TABLE_MODEL);
         contentTable.setEnabled(true);
         detailTextField.setEditable(false);
         refresh();
@@ -106,8 +104,9 @@ public class TaintListWindow {
             size = taints.size();
             for (Taint taint : taints
             ) {
-                taint.setDetail(TAINT_DETAIL + taint.getId());
-                TABLE_MODEL.addRow(TaintConvert.convert(taint));
+                String taintDetail = TaintUtil.config("URL") +TaintConstant.TAINT_DETAIL;
+                taint.setDetail( taintDetail+ taint.getId());
+                TaintConstant.TABLE_MODEL.addRow(TaintConvert.convert(taint));
             }
         } catch (Exception e) {
             size = 0;
@@ -142,8 +141,8 @@ public class TaintListWindow {
             size = taints.size();
             for (Taint taint : taints
             ) {
-                taint.setDetail(TAINT_DETAIL + taint.getId());
-                TABLE_MODEL.addRow(TaintConvert.convert(taint));
+                taint.setDetail(TaintConstant.TAINT_DETAIL + taint.getId());
+                TaintConstant.TABLE_MODEL.addRow(TaintConvert.convert(taint));
             }
         } catch (Exception e) {
             size = 0;
@@ -201,8 +200,8 @@ public class TaintListWindow {
     }
 
     public void removeAll() {
-        while (TABLE_MODEL.getRowCount() > 0) {
-            TABLE_MODEL.removeRow(0);
+        while (TaintConstant.TABLE_MODEL.getRowCount() > 0) {
+            TaintConstant.TABLE_MODEL.removeRow(0);
         }
     }
 
@@ -214,7 +213,7 @@ public class TaintListWindow {
             List<Taint> urls = searchUrl(searchTextField.getText());
             for (Taint url : urls
             ) {
-                TABLE_MODEL.addRow(TaintConvert.convert(url));
+                TaintConstant.TABLE_MODEL.addRow(TaintConvert.convert(url));
             }
         }
         if (levelConfirm.equals(confirm)) {
@@ -222,7 +221,7 @@ public class TaintListWindow {
             List<Taint> levels = searchLevel(searchTextField.getText());
             for (Taint level : levels
             ) {
-                TABLE_MODEL.addRow(TaintConvert.convert(level));
+                TaintConstant.TABLE_MODEL.addRow(TaintConvert.convert(level));
             }
         }
     }

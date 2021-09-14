@@ -1,7 +1,6 @@
 package cn.huoxian.dongtai.plugin.pojo;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author niuerzhuang@huoxian.cn

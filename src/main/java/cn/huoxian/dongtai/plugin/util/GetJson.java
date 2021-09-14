@@ -1,22 +1,20 @@
 package cn.huoxian.dongtai.plugin.util;
 
 import cn.huoxian.dongtai.plugin.agent.AgentMassage;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import static cn.huoxian.dongtai.plugin.util.TaintConstant.*;
 import static cn.huoxian.dongtai.plugin.util.TaintUtil.config;
 
 
@@ -28,7 +26,7 @@ public class GetJson {
      * 获取规则集的 Json 字符串
      */
     public static String getRuleJson(int type) {
-        String dongTaiUrlStr = config("URL") + RULESET_API_RULE_TYPE + type;
+        String dongTaiUrlStr = config("URL") + TaintConstant.RULESET_API_RULE_TYPE + type;
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(dongTaiUrlStr);
         RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(1000).setConnectTimeout(1000).build();
@@ -45,8 +43,8 @@ public class GetJson {
                 document.append(line);
             }
             reader.close();
-            JSONObject jsonObject = JSONObject.parseObject(document.toString());
-            return jsonObject.toJSONString();
+            JSONObject jsonObject = new JSONObject(document.toString());
+            return jsonObject.toString();
         } catch (IOException ignore) {
         }
         return "";
@@ -56,7 +54,7 @@ public class GetJson {
         try {
             String utf8 = "UTF-8";
             String agentName = URLEncoder.encode(AgentMassage.getAgentToken(), utf8);
-            String taintsAPI = config("URL") + TAINTS_API_GET + "?name=" + agentName;
+            String taintsAPI = config("URL") + TaintConstant.TAINTS_API_GET + "?name=" + agentName;
             CloseableHttpClient client = HttpClients.createDefault();
             HttpGet get = new HttpGet(taintsAPI);
             RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(1000).setConnectTimeout(1000).build();
@@ -82,7 +80,7 @@ public class GetJson {
         try {
             String utf8 = "UTF-8";
             String agentName = URLEncoder.encode(AgentMassage.getAgentToken(), utf8);
-            String taintsAPI = config("URL") + TAINTS_COUNT_API_GET + "?name=" + agentName;
+            String taintsAPI = config("URL") + TaintConstant.TAINTS_COUNT_API_GET + "?name=" + agentName;
             CloseableHttpClient client = HttpClients.createDefault();
             HttpGet get = new HttpGet(taintsAPI);
             RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(1000).setConnectTimeout(1000).build();

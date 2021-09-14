@@ -1,6 +1,6 @@
 package cn.huoxian.dongtai.plugin.dialog;
 
-import com.alibaba.fastjson.JSONObject;
+import cn.huoxian.dongtai.plugin.util.TaintConstant;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
@@ -8,7 +8,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +19,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import static cn.huoxian.dongtai.plugin.util.TaintConstant.*;
 import static cn.huoxian.dongtai.plugin.util.TaintUtil.config;
 import static cn.huoxian.dongtai.plugin.util.TaintUtil.notificationError;
 
@@ -66,7 +65,7 @@ public class TaintConfigDialogAdd extends JDialog {
         getRootPane().setDefaultButton(buttonOk);
         taintSourceTextField.setVisible(false);
         setCenter();
-        if (CLASS_TYPE_INTERFACE.equals(classKind)) {
+        if (TaintConstant.CLASS_TYPE_INTERFACE.equals(classKind)) {
             inheritanceDepthRadioButton2.setSelected(true);
         } else {
             inheritanceDepthRadioButton1.setSelected(true);
@@ -75,19 +74,19 @@ public class TaintConfigDialogAdd extends JDialog {
         ruleDetailTextField.setText(methodSignature);
         ruleSetComboBox.addActionListener(e -> {
             String selectedItem = (String) ruleSetComboBox.getSelectedItem();
-            if (RULE_STAIN_SOURCE.equals(selectedItem)) {
+            if (TaintConstant.RULE_STAIN_SOURCE.equals(selectedItem)) {
                 setVisible(false);
                 TaintConfigDialog dialog = new TaintConfigDialog(methodSignature, classKind);
                 dialog.setRuleSet(1);
                 dialog.pack();
                 dialog.setVisible(true);
-            } else if (RULE_SPREAD.equals(selectedItem)) {
+            } else if (TaintConstant.RULE_SPREAD.equals(selectedItem)) {
                 setVisible(false);
                 TaintConfigDialog dialog = new TaintConfigDialog(methodSignature, classKind);
                 dialog.setRuleSet(2);
                 dialog.pack();
                 dialog.setVisible(true);
-            } else if (RULE_FILTER.equals(selectedItem)) {
+            } else if (TaintConstant.RULE_FILTER.equals(selectedItem)) {
                 setVisible(false);
                 TaintConfigDialog dialog = new TaintConfigDialog(methodSignature, classKind);
                 dialog.setRuleSet(3);
@@ -101,11 +100,11 @@ public class TaintConfigDialogAdd extends JDialog {
         ruleDetailTextField.setText(methodSignature);
         taintSourceComboBox.addActionListener(e -> {
             String selectedItem = (String) taintSourceComboBox.getSelectedItem();
-            if (SOURCE_TYPE_OBJECT.equals(selectedItem)) {
+            if (TaintConstant.SOURCE_TYPE_OBJECT.equals(selectedItem)) {
                 taintSourceTextField.setVisible(false);
-            } else if (SOURCE_TYPE_RETURN.equals(selectedItem)) {
+            } else if (TaintConstant.SOURCE_TYPE_RETURN.equals(selectedItem)) {
                 taintSourceTextField.setVisible(false);
-            } else if (SOURCE_TYPE_PARAMETER.equals(selectedItem)) {
+            } else if (TaintConstant.SOURCE_TYPE_PARAMETER.equals(selectedItem)) {
                 taintSourceTextField.setVisible(true);
                 taintSourceTextField.setEditable(true);
                 TaintConfigDialogAdd.this.pack();
@@ -134,11 +133,11 @@ public class TaintConfigDialogAdd extends JDialog {
                 taintSourceAddTextField.setVisible(false);
                 taintSourceAddComboBox2.addActionListener(ex -> {
                     String selectedItem = (String) taintSourceAddComboBox2.getSelectedItem();
-                    if (SOURCE_TYPE_OBJECT.equals(selectedItem)) {
+                    if (TaintConstant.SOURCE_TYPE_OBJECT.equals(selectedItem)) {
                         taintSourceAddTextField.setVisible(false);
-                    } else if (SOURCE_TYPE_RETURN.equals(selectedItem)) {
+                    } else if (TaintConstant.SOURCE_TYPE_RETURN.equals(selectedItem)) {
                         taintSourceAddTextField.setVisible(false);
-                    } else if (SOURCE_TYPE_PARAMETER.equals(selectedItem)) {
+                    } else if (TaintConstant.SOURCE_TYPE_PARAMETER.equals(selectedItem)) {
                         taintSourceAddTextField.setVisible(true);
                         pa();
                     } else {
@@ -182,11 +181,11 @@ public class TaintConfigDialogAdd extends JDialog {
             json.put("rule_value", methodSignature);
             StringBuilder s1 = new StringBuilder();
             String selectedItem = (String) taintSourceComboBox.getSelectedItem();
-            if (SOURCE_TYPE_OBJECT.equals(selectedItem)) {
+            if (TaintConstant.SOURCE_TYPE_OBJECT.equals(selectedItem)) {
                 s1 = new StringBuilder("O");
-            } else if (SOURCE_TYPE_RETURN.equals(selectedItem)) {
+            } else if (TaintConstant.SOURCE_TYPE_RETURN.equals(selectedItem)) {
                 s1 = new StringBuilder("R");
-            } else if (SOURCE_TYPE_PARAMETER.equals(selectedItem)) {
+            } else if (TaintConstant.SOURCE_TYPE_PARAMETER.equals(selectedItem)) {
                 String parameterNum = taintSourceTextField.getText();
                 s1 = new StringBuilder("P" + parameterNum);
             }
@@ -198,7 +197,7 @@ public class TaintConfigDialogAdd extends JDialog {
                 String re = (String) wdly1.getSelectedItem();
                 String wdly = (String) wdly2.getSelectedItem();
                 String par = wdlyText.getText();
-                s1.append(wdAdd(re, wdly, par));
+                s1.append(taintAdd(re, wdly, par));
             }
             json.put("rule_source", s1.toString());
             if (taintTrackRadioButton1.isSelected()) {
@@ -214,7 +213,7 @@ public class TaintConfigDialogAdd extends JDialog {
                 json.put("inherit", "all");
             }
             json.put("rule_target", "");
-            requestJson(url + RULESET_API_RULE_ADD);
+            requestJson(url + TaintConstant.RULESET_API_RULE_ADD);
             onOk();
         });
         buttonCancel.addActionListener(e -> onCancel());
@@ -243,26 +242,26 @@ public class TaintConfigDialogAdd extends JDialog {
         this.pack();
     }
 
-    public String wdAdd(String re, String wd, String par) {
-        String result = "";
+    public String taintAdd(String re, String wd, String par) {
+        String taintAddresult = "";
         String and = "和";
         if (and.equals(re)) {
-            result += "&";
+            taintAddresult += "&";
         } else {
-            result += "|";
+            taintAddresult += "|";
         }
         String parNum = "参数编号";
         if (parNum.equals(par)) {
             par = "";
         }
-        if (SOURCE_TYPE_OBJECT.equals(wd)) {
-            result += "O";
-        } else if (SOURCE_TYPE_RETURN.equals(wd)) {
-            result += "R";
-        } else if (SOURCE_TYPE_PARAMETER.equals(wd)) {
-            result = result + "P" + par;
+        if (TaintConstant.SOURCE_TYPE_OBJECT.equals(wd)) {
+            taintAddresult += "O";
+        } else if (TaintConstant.SOURCE_TYPE_RETURN.equals(wd)) {
+            taintAddresult += "R";
+        } else if (TaintConstant.SOURCE_TYPE_PARAMETER.equals(wd)) {
+            taintAddresult = taintAddresult + "P" + par;
         }
-        return result;
+        return taintAddresult;
     }
 
     /**
@@ -270,8 +269,8 @@ public class TaintConfigDialogAdd extends JDialog {
      */
     public void setCenter() {
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = DIALOG_SIZE_WIDTH;
-        int height = DIALOG_SIZE_HEIGHT;
+        int width = TaintConstant.DIALOG_SIZE_WIDTH;
+        int height = TaintConstant.DIALOG_SIZE_HEIGHT;
         setBounds((d.width - width) / 2, (d.height - height) / 2, width, height);
     }
 
@@ -294,10 +293,10 @@ public class TaintConfigDialogAdd extends JDialog {
                 document.append(line);
             }
             reader.close();
-            JSONObject jsonObject = JSONObject.parseObject(document.toString());
+            JSONObject jsonObject = new JSONObject(document.toString());
             String parameter = (String) jsonObject.get("status");
-            if (REQUEST_JSON_ERROR_STATUS.equals(parameter)) {
-                notificationError(NOTIFICATION_CONTENT_ERROR_COMPLETE);
+            if (TaintConstant.REQUEST_JSON_ERROR_STATUS.equals(parameter)) {
+                notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_COMPLETE);
             }
         } catch (IOException e1) {
             String content = "请求未发送成功，请检查 DongTai IAST自定义规则 中的配置是否正确！";

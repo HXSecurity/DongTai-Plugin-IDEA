@@ -1,5 +1,7 @@
 package cn.huoxian.dongtai.plugin.agent;
 
+import cn.huoxian.dongtai.plugin.util.TaintConstant;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,8 +10,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
 import java.util.regex.Pattern;
-
-import static cn.huoxian.dongtai.plugin.util.TaintConstant.*;
 
 /**
  * @author niuerzhuang@huoxian.cn
@@ -24,7 +24,7 @@ public class AgentMassage {
         if (AGENT_NAME == null || AGENT_NAME.length() < 40) {
             String osName = System.getProperty("os.name");
             String hostname = getInternalHostName();
-            AGENT_NAME = osName + "-" + hostname + "-" + AGENT_VERSION_VALUE + "-" + getEngineName();
+            AGENT_NAME = osName + "-" + hostname + "-" + TaintConstant.AGENT_VERSION_VALUE + "-" + getEngineName();
         }
         return AGENT_NAME;
     }
@@ -70,22 +70,11 @@ public class AgentMassage {
      */
     public static Properties configRead() {
         try {
-            File file;
-            String osName = System.getProperty("os.name");
-            if (MAC_PATTERN.matcher(osName).find()) {
-                file = new File(AGENT_CONFIG_PATH_MAC);
-            } else {
-                file = new File(AGENT_CONFIG_PATH_WINDOWS);
-            }
+            File file = new File(TaintConstant.AGENT_CONFIG_PATH);
             if (!file.exists()) {
                 System.out.println("请使用 Run With IAST 启动项目");
             }
-            InputStream in;
-            if (MAC_PATTERN.matcher(osName).find()) {
-                in = new BufferedInputStream(new FileInputStream(AGENT_CONFIG_PATH_MAC));
-            } else {
-                in = new BufferedInputStream(new FileInputStream(AGENT_CONFIG_PATH_WINDOWS));
-            }
+            InputStream in = new BufferedInputStream(new FileInputStream(TaintConstant.AGENT_CONFIG_PATH));
             Properties p = new Properties();
             p.load(in);
             return p;

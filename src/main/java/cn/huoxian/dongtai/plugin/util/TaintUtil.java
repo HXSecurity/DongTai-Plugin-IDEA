@@ -12,16 +12,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
 import static cn.huoxian.dongtai.plugin.dialog.RemoteConfigDialog.isNewToken;
-import static cn.huoxian.dongtai.plugin.util.TaintConstant.*;
 
 /**
  * @author niuerzhuang@huoxian.cn
  **/
 public class TaintUtil {
-    private final static Pattern MAC_PATTERN = Pattern.compile("Mac.*");
 
     /**
      * 写入配置文件内容
@@ -29,14 +26,7 @@ public class TaintUtil {
     public static void configWrite(Map<String, String> maps) {
         Properties properties = new Properties();
         try {
-            File file;
-            String osName = System.getProperty("os.name");
-            if (MAC_PATTERN.matcher(osName).find()) {
-                String home = System.getProperty("user.home");
-                file = new File(home + CONFIG_FILENAME_MAC);
-            } else {
-                file = new File(CONFIG_FILENAME_WINDOWS);
-            }
+            File file = new File(TaintConstant.CONFIG_FILENAME);
             if (!file.exists()) {
                 file.createNewFile();
             }
@@ -57,29 +47,15 @@ public class TaintUtil {
      */
     public static Properties configRead() {
         try {
-            File file;
-            File path;
-            String osName = System.getProperty("os.name");
-            String home = System.getProperty("user.home");
-            if (MAC_PATTERN.matcher(osName).find()) {
-                path = new File(home + "/Library/iastagent");
-                file = new File(home + CONFIG_FILENAME_MAC);
-            } else {
-                path = new File(home + "/Library/iastagent");
-                file = new File(CONFIG_FILENAME_WINDOWS);
-            }
+            File file = new File(TaintConstant.CONFIG_FILENAME);
+            File path = new File(TaintConstant.IAST_AGENT_PATH);
             if (!path.isDirectory()) {
                 path.mkdirs();
             }
             if (!file.exists()) {
                 file.createNewFile();
             }
-            InputStream in;
-            if (MAC_PATTERN.matcher(osName).find()) {
-                in = new BufferedInputStream(new FileInputStream(home + CONFIG_FILENAME_MAC));
-            } else {
-                in = new BufferedInputStream(new FileInputStream(CONFIG_FILENAME_WINDOWS));
-            }
+            InputStream in = new BufferedInputStream(new FileInputStream(TaintConstant.CONFIG_FILENAME));
             Properties p = new Properties();
             p.load(in);
             return p;
@@ -132,7 +108,7 @@ public class TaintUtil {
         if (!file.exists()) {
             file.mkdirs();
         }
-        File file1 = new File(filePath + "agent.jar");
+        File file1 = new File(filePath + File.separator + TaintConstant.AGENT_NAME);
         if ((!file1.exists()) || isNewToken) {
             isNewToken = false;
             FileOutputStream fileOut = null;
@@ -150,7 +126,7 @@ public class TaintUtil {
                 conn.connect();
                 inputStream = conn.getInputStream();
                 BufferedInputStream bis = new BufferedInputStream(inputStream);
-                fileOut = new FileOutputStream(filePath + AGENT_NAME);
+                fileOut = new FileOutputStream(filePath + File.separator + TaintConstant.AGENT_NAME);
                 BufferedOutputStream bos = new BufferedOutputStream(fileOut);
                 byte[] buf = new byte[4096];
                 int length = bis.read(buf);
@@ -162,10 +138,10 @@ public class TaintUtil {
                 bis.close();
                 conn.disconnect();
             } catch (Exception e) {
-                notificationError(NOTIFICATION_CONTENT_ERROR_FAILURE);
+                notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
                 RemoteConfigDialog remoteConfigDialog = new RemoteConfigDialog();
                 remoteConfigDialog.pack();
-                remoteConfigDialog.setTitle(NAME_DONGTAI_IAST_RULE);
+                remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
                 remoteConfigDialog.setVisible(true);
             }
         }
@@ -183,20 +159,8 @@ public class TaintUtil {
                 url = url.substring(0, url.length() - 1);
             }
         } catch (Exception e) {
-            url = "http://openapi.iast.huoxian.cn:8000";
+            url = TaintConstant.DEFAULT_AGENT_URL;
         }
         return url;
-    }
-
-    /**
-     * 辨别操作系统
-     */
-    public static String os() {
-        String osName = System.getProperty("os.name");
-        if (MAC_PATTERN.matcher(osName).find()) {
-            return AGENT_PATH_MAC;
-        } else {
-            return AGENT_PATH_WINDOWS;
-        }
     }
 }
