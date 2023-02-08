@@ -9,8 +9,11 @@ import com.intellij.execution.impl.DefaultJavaProgramRunner;
 import com.intellij.execution.jar.JarApplicationConfiguration;
 import com.intellij.execution.remote.RemoteConfiguration;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.execution.target.TargetEnvironmentAwareRunProfileState;
 import com.intellij.execution.ui.RunContentDescriptor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.concurrency.Promise;
 
 import static cn.huoxian.dongtai.plugin.util.TaintUtil.downloadAgent;
 import static cn.huoxian.dongtai.plugin.util.TaintUtil.notificationWarning;
@@ -38,7 +41,9 @@ public class RunCodeRunner extends DefaultJavaProgramRunner {
 
     @Override
     protected RunContentDescriptor doExecute(@NotNull RunProfileState state, @NotNull ExecutionEnvironment env) throws ExecutionException {
+        System.out.println("start run");
         try {
+
             downloadAgent(TaintConstant.AGENT_URL, TaintConstant.AGENT_PATH);
         } catch (Exception e) {
             notificationWarning(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
@@ -51,8 +56,30 @@ public class RunCodeRunner extends DefaultJavaProgramRunner {
         JavaParameters parameters = ((JavaCommandLine) state).getJavaParameters();
         ParametersList parametersList = parameters.getVMParametersList();
         parametersList.add("-javaagent:" + TaintConstant.AGENT_PATH + "agent.jar");
-        parametersList.add("-Dproject.name=" + name);
+        parametersList.add("-Ddongtai.app.name=" + name);
+        parametersList.add("-Diast.server.mode=local");
         return super.doExecute(state, env);
     }
 
+    @Override
+    protected @NotNull Promise<@Nullable RunContentDescriptor> doExecuteAsync(@NotNull TargetEnvironmentAwareRunProfileState state, @NotNull ExecutionEnvironment env) throws ExecutionException {
+        System.out.println("start run doExecuteAsync");
+        try {
+
+            downloadAgent(TaintConstant.AGENT_URL, TaintConstant.AGENT_PATH);
+        } catch (Exception e) {
+            notificationWarning(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
+            RemoteConfigDialog remoteConfigDialog = new RemoteConfigDialog();
+            remoteConfigDialog.pack();
+            remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
+            remoteConfigDialog.setVisible(true);
+        }
+        String name = env.getProject().getName();
+        JavaParameters parameters = ((JavaCommandLine) state).getJavaParameters();
+        ParametersList parametersList = parameters.getVMParametersList();
+        parametersList.add("-javaagent:" + TaintConstant.AGENT_PATH + "agent.jar");
+        parametersList.add("-Ddongtai.app.name=" + name);
+        parametersList.add("-Diast.server.mode=local");
+        return super.doExecuteAsync(state, env);
+    }
 }

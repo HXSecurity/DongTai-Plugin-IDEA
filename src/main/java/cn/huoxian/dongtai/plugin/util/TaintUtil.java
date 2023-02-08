@@ -42,6 +42,8 @@ public class TaintUtil {
             for (String key : maps.keySet()) {
                 properties.setProperty(key, maps.get(key));
             }
+            IdeaPropertity.TOKEN=maps.get("TOKEN");
+            IdeaPropertity.URL=maps.get("URL");
             FileOutputStream fos = new FileOutputStream(file);
             properties.store(fos, null);
             fos.flush();
@@ -138,6 +140,7 @@ public class TaintUtil {
             HttpURLConnection conn = null;
             InputStream inputStream = null;
             try {
+                System.out.println("start download");
                 URL httpUrl = new URL(url);
                 conn = (HttpURLConnection) httpUrl.openConnection();
                 conn.setRequestProperty("Content-type", "application/json; charset=utf-8");
@@ -160,6 +163,7 @@ public class TaintUtil {
                 bos.close();
                 bis.close();
                 conn.disconnect();
+                System.out.println("end download");
             } catch (Exception e) {
                 notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
                 RemoteConfigDialog remoteConfigDialog = new RemoteConfigDialog();
@@ -182,7 +186,8 @@ public class TaintUtil {
                 url = url.substring(0, url.length() - 1);
             }
         } catch (Exception e) {
-            url = "http://openapi.iast.huoxian.cn:8000";
+//            url = "http://openapi.iast.huoxian.cn:8000";
+            url = "http://iast.io";
         }
         return url;
     }

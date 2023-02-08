@@ -54,6 +54,8 @@ public class GetJson {
         try {
             String utf8 = "UTF-8";
             String agentName = URLEncoder.encode(AgentMassage.getAgentToken(), utf8);
+//            String agentName =AgentMassage.config("engine.name");
+            agentName = agentName.replaceAll("/+", "%20");
             String taintsAPI = config("URL") + TaintConstant.TAINTS_API_GET + "?name=" + agentName;
             CloseableHttpClient client = HttpClients.createDefault();
             HttpGet get = new HttpGet(taintsAPI);

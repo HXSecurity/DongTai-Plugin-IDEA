@@ -30,9 +30,10 @@ public class AgentMassage {
     }
 
     public static String getEngineName() {
-        if (null == engineName || engineName.length() < 2) {
-            engineName = System.getProperty("engine.name", config("engine.name"));
-        }
+        //每次启动的agentname都重新获取,idea的项目可能启动多次
+//        if (null == engineName || engineName.length() < 2) {
+            engineName = config("engine.name");
+//        }
         return engineName;
     }
 
@@ -79,6 +80,7 @@ public class AgentMassage {
             }
             if (!file.exists()) {
                 System.out.println("请使用 Run With IAST 启动项目");
+                System.out.println("no file.............");
             }
             InputStream in;
             if (MAC_PATTERN.matcher(osName).find()) {

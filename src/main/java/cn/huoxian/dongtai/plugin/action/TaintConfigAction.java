@@ -88,8 +88,7 @@ public class TaintConfigAction extends AnAction {
     private String getParameterTypes(PsiMethod psiMethod) {
         StringBuilder parameterTypesStr = new StringBuilder();
         PsiType[] parameterTypes = psiMethod.getSignature(PsiSubstitutor.EMPTY).getParameterTypes();
-        for (PsiType psiType : parameterTypes
-        ) {
+        for (PsiType psiType : parameterTypes) {
             parameterTypesStr.append(psiType.getInternalCanonicalText()).append(",");
         }
         String superfluousWords = ",";

@@ -67,15 +67,18 @@ public interface TaintConstant {
 
     String AGENT_PATH_WINDOWS = PROPERTY + "/Library/iastagent/";
 
-    String DEFAULT_URL = "https://iast.huoxian.cn";
+    String DEFAULT_URL = "http://iast-test.huoxian.cn";
 
-    String DEFAULT_AGENT_URL = "http://openapi.iast.huoxian.cn:8000";
-
+    String DEFAULT_AGENT_URL = "http://iast-test.huoxian.cn";
+/*
     String AGENT_CONFIG_PATH_MAC = AGENT_PATH_MAC + "config/iast.properties";
 
-    String AGENT_CONFIG_PATH_WINDOWS = AGENT_PATH_WINDOWS + "config/iast.properties";
-
-    String AGENT_VERSION_VALUE = "v1.0.0";
+    String AGENT_CONFIG_PATH_WINDOWS = AGENT_PATH_WINDOWS + "config/iast.properties";*/
+    String VERSION="v1.8.2-beta";
+    String AGENT_CONFIG_PATH_MAC = PROPERTY +"/AppData/Local/Temp/"+ "dongtai-"+System.getenv().get("USERNAME")+"/"+VERSION+"/iast.properties";
+    //    C:\Users\17906\AppData\Local\Temp\\dongtai-17906\v1.8.1\iast.properties
+    String AGENT_CONFIG_PATH_WINDOWS = PROPERTY +"/AppData/Local/Temp/"+ "dongtai-"+System.getenv().get("USERNAME")+"/"+VERSION+"/iast.properties";
+    String AGENT_VERSION_VALUE = "v1.8.2-beta";
 
     String[] COLUMN_NAME = {"url", "漏洞类型", "等级", "source点", "sink点"};
 
@@ -86,5 +89,7 @@ public interface TaintConstant {
     String AGENT_PATH = TaintUtil.os();
 
     String REQUEST_JSON_ERROR_STATUS = "202";
+    String TOKEN="a1c0fbd5c98ecf4539e9d293b5bde73d9b208edf";
+
 
 }

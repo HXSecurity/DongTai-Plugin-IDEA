@@ -2,7 +2,7 @@ package cn.huoxian.dongtai.plugin.executor;
 
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.openapi.util.IconLoader;
-import org.jetbrains.annotations.NotNull;
+import com.sun.istack.NotNull;
 
 import javax.swing.*;
 

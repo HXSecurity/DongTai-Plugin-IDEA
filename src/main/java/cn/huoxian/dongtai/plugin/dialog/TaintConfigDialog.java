@@ -2,6 +2,7 @@ package cn.huoxian.dongtai.plugin.dialog;
 
 import cn.huoxian.dongtai.plugin.util.GetJson;
 import cn.huoxian.dongtai.plugin.util.TaintConstant;
+import cn.huoxian.dongtai.plugin.util.UnicodeUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.JsonArray;
@@ -393,8 +394,9 @@ public class TaintConfigDialog extends JDialog {
             HttpResponse httpResponse = client.execute(post);
             HttpEntity entity = httpResponse.getEntity();
             System.err.println("状态:" + httpResponse.getStatusLine());
-            System.err.println("参数:" + EntityUtils.toString(entity));
+            System.err.println("参数:" + UnicodeUtil.unicodeDecode(EntityUtils.toString(entity)));
             notificationInfo(TaintConstant.NOTIFICATION_CONTENT_INFO_SUCCESS);
+            notificationInfo(UnicodeUtil.unicodeDecode(EntityUtils.toString(entity)));
         } catch (IOException e1) {
             notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
         }

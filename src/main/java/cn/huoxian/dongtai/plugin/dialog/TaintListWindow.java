@@ -40,6 +40,7 @@ public class TaintListWindow {
     private int size;
 
     public TaintListWindow() {
+        System.out.println("init  TaintListWindow 开始");
         init();
         searchConfirmButton.addActionListener(new ActionListener() {
             @Override
@@ -210,8 +211,7 @@ public class TaintListWindow {
         if (urlConfirm.equals(confirm)) {
             removeAll();
             List<Taint> urls = searchUrl(searchTextField.getText());
-            for (Taint url : urls
-            ) {
+            for (Taint url : urls) {
                 TaintConstant.TABLE_MODEL.addRow(TaintConvert.convert(url));
             }
         }

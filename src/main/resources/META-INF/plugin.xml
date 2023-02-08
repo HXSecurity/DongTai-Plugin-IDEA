@@ -43,7 +43,7 @@
                     secondary="true"
                     anchor="right"
                     factoryClass="cn.huoxian.dongtai.plugin.toolwindow.TaintListWindowFactory"
-                    icon="assets/toolwindow.svg">
+                    icon="/assets/toolwindow.svg">
         </toolWindow>
     </extensions>
 
