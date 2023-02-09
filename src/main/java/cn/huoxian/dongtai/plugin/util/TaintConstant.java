@@ -55,7 +55,7 @@ public interface TaintConstant {
 
     String NOTIFICATION_CONTENT_WARNING_METHOD = "您需要选择一个方法的方法名！";
 
-    String NOTIFICATION_CONTENT_INFO_SUCCESS = "请求发送成功";
+    String NOTIFICATION_CONTENT_INFO_SUCCESS = "请求发送成功,策略规则创建成功";
 
     String AGENT_NAME = "agent.jar";
 
@@ -89,6 +89,7 @@ public interface TaintConstant {
     String AGENT_PATH = TaintUtil.os();
 
     String REQUEST_JSON_ERROR_STATUS = "202";
+    String REQUEST_JSON_SUCCESS_STATUS = "201";
     String TOKEN="a1c0fbd5c98ecf4539e9d293b5bde73d9b208edf";
 
 

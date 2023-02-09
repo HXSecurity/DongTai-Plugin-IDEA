@@ -19,8 +19,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import static cn.huoxian.dongtai.plugin.util.TaintUtil.config;
-import static cn.huoxian.dongtai.plugin.util.TaintUtil.notificationError;
+import static cn.huoxian.dongtai.plugin.util.TaintUtil.*;
 
 /**
  * @author niuerzhuang@huoxian.cn
@@ -179,6 +178,7 @@ public class TaintConfigDialogAdd extends JDialog {
             token = config("TOKEN");
             json.put("rule_type_id", map.get(ruleTypeComboBox.getSelectedItem()));
             json.put("rule_value", methodSignature);
+            json.put("language_id","1");
             StringBuilder s1 = new StringBuilder();
             String selectedItem = (String) taintSourceComboBox.getSelectedItem();
             if (TaintConstant.SOURCE_TYPE_OBJECT.equals(selectedItem)) {
@@ -294,8 +294,10 @@ public class TaintConfigDialogAdd extends JDialog {
             }
             reader.close();
             JSONObject jsonObject = JSONObject.parseObject(document.toString());
-            String parameter = (String) jsonObject.get("status");
-            if (TaintConstant.REQUEST_JSON_ERROR_STATUS.equals(parameter)) {
+            String parameter = String.valueOf(jsonObject.get("status"));
+            if (TaintConstant.REQUEST_JSON_SUCCESS_STATUS.equals(parameter)) {
+                notificationInfo(TaintConstant.NOTIFICATION_CONTENT_INFO_SUCCESS);
+            }else{
                 notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_COMPLETE);
             }
         } catch (IOException e1) {
