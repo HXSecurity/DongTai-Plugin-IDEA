@@ -4,10 +4,11 @@ import cn.huoxian.dongtai.plugin.pojo.ResponseTaint;
 import cn.huoxian.dongtai.plugin.pojo.ResponseTaintCount;
 import cn.huoxian.dongtai.plugin.pojo.Taint;
 import cn.huoxian.dongtai.plugin.pojo.TaintConvert;
+import cn.huoxian.dongtai.plugin.util.ConfigUtil;
 import cn.huoxian.dongtai.plugin.util.GetJson;
 import cn.huoxian.dongtai.plugin.util.TaintConstant;
 import cn.huoxian.dongtai.plugin.util.TaintUtil;
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
@@ -38,9 +39,9 @@ public class TaintListWindow {
     private List<Taint> taints;
     private String json = "";
     private int size;
+    Timer timer ;
 
     public TaintListWindow() {
-        System.out.println("init  TaintListWindow 开始");
         init();
         searchConfirmButton.addActionListener(new ActionListener() {
             @Override
@@ -58,9 +59,21 @@ public class TaintListWindow {
         refreshListButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                refresh();
-                timeTaskNotice(90000, 10000);
-                TaintUtil.notificationInfo("已刷新");
+                if(ConfigUtil.env==null){
+                    TaintUtil.notificationWarning("请使用 Run With IAST 启动项目");
+                    if (timer!=null){
+                        timer.cancel();
+                    }
+                }
+                else {
+                    refresh();
+                    if (timer==null){
+                        timer=new Timer();
+                        timeTaskNotice(90000, 1000*60*20);
+                    }
+                    TaintUtil.notificationWarning("已刷新");
+                }
+
             }
         });
         detailButton.addActionListener(new ActionListener() {
@@ -74,7 +87,6 @@ public class TaintListWindow {
                     URI uri = new URI(detail);
                     desktop.browse(uri);
                 } catch (Exception e) {
-                    TaintUtil.notificationWarning("请在列表中选择漏洞");
                 }
             }
         });
@@ -98,23 +110,29 @@ public class TaintListWindow {
     }
 
     public void refresh() {
+        int count=0;
         removeAll();
         json = GetJson.getTaintsJson();
         taints = getTaints(json);
+        TaintUtil.notificationWarning("taints"+taints);
         try {
             size = taints.size();
             for (Taint taint : taints
             ) {
+
                 taint.setDetail(TaintConstant.TAINT_DETAIL + taint.getId());
                 TaintConstant.TABLE_MODEL.addRow(TaintConvert.convert(taint));
             }
         } catch (Exception e) {
+            TaintUtil.notificationWarning("长度为"+size);
             size = 0;
+
         }
     }
 
     public void timeTaskNotice(Integer delay, Integer period) {
-        Timer timer = new Timer();
+
+
         timer.schedule(new TimerTask() {
             public void run() {
                 json = GetJson.getTaintsJson();
@@ -150,10 +168,13 @@ public class TaintListWindow {
     }
 
     public List<Taint> getTaints(String json) {
-        Gson gson = new Gson();
         ResponseTaint responseTaint = null;
         try {
-            responseTaint = gson.fromJson(json, ResponseTaint.class);
+             responseTaint = JSONObject.parseObject(json, ResponseTaint.class);
+            if (responseTaint.getStatus().equals(TaintConstant.REQUEST_JSON_ERROR_STATUS)){
+                TaintUtil.notificationWarning(responseTaint.getMsg());
+                new WarnDialog(responseTaint.getMsg());
+            }
             return responseTaint.getData();
         } catch (Exception exception) {
             return new ArrayList<>();
@@ -161,10 +182,14 @@ public class TaintListWindow {
     }
 
     public Integer getTaintsCount(String json) {
-        Gson gson = new Gson();
         ResponseTaintCount responseTaintCount = null;
         try {
-            responseTaintCount = gson.fromJson(json, ResponseTaintCount.class);
+            responseTaintCount = JSONObject.parseObject(json, ResponseTaintCount.class);
+            if (responseTaintCount.getStatus().equals(TaintConstant.REQUEST_JSON_ERROR_STATUS)){
+                TaintUtil.notificationWarning(responseTaintCount.getMsg());
+                new WarnDialog(responseTaintCount.getMsg());
+                return null;
+            }
             return responseTaintCount.getCount();
         } catch (Exception exception) {
             return null;

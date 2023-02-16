@@ -2,7 +2,10 @@ package cn.huoxian.dongtai.plugin.runner;
 
 import cn.huoxian.dongtai.plugin.dialog.RemoteConfigDialog;
 import cn.huoxian.dongtai.plugin.executor.RunExecutor;
+import cn.huoxian.dongtai.plugin.util.ConfigUtil;
+import cn.huoxian.dongtai.plugin.util.ReadManifest;
 import cn.huoxian.dongtai.plugin.util.TaintConstant;
+import cn.huoxian.dongtai.plugin.util.TaintUtil;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.impl.DefaultJavaProgramRunner;
@@ -52,12 +55,27 @@ public class RunCodeRunner extends DefaultJavaProgramRunner {
             remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
             remoteConfigDialog.setVisible(true);
         }
-        String name = env.getProject().getName();
+        ConfigUtil.projectName =env.getProject().getName();
         JavaParameters parameters = ((JavaCommandLine) state).getJavaParameters();
         ParametersList parametersList = parameters.getVMParametersList();
+        for (String item : parametersList.getParameters()) {
+            TaintUtil.notificationWarning(item);
+            if (item.contains("dongtai.app.name=")){
+                String[] split = item.split("=");
+                String name = split[1].trim();
+                if (!name.equals("")&&name!=null){
+                    ConfigUtil.projectName=name;
+                }
+            }
+        }
         parametersList.add("-javaagent:" + TaintConstant.AGENT_PATH + "agent.jar");
-        parametersList.add("-Ddongtai.app.name=" + name);
-        parametersList.add("-Diast.server.mode=local");
+        parametersList.add("-Ddongtai.app.name=" +  ConfigUtil.projectName);
+        parametersList.add("-Ddongtai.app.create=true");
+        parametersList.add("-Ddongtai.server.token=" +ConfigUtil.getOpenApiToken() );
+        parametersList.add("-Ddongtai.log.level="+ConfigUtil.getLoglevel());
+        parametersList.add("-Ddongtai.server.url=" +ConfigUtil.getURL());
+        ConfigUtil.env=env;
+        TaintUtil.notificationWarning("Run With IAST 启动项目："   +ConfigUtil.projectName);
         return super.doExecute(state, env);
     }
 
@@ -65,7 +83,6 @@ public class RunCodeRunner extends DefaultJavaProgramRunner {
     protected @NotNull Promise<@Nullable RunContentDescriptor> doExecuteAsync(@NotNull TargetEnvironmentAwareRunProfileState state, @NotNull ExecutionEnvironment env) throws ExecutionException {
         System.out.println("start run doExecuteAsync");
         try {
-
             downloadAgent(TaintConstant.AGENT_URL, TaintConstant.AGENT_PATH);
         } catch (Exception e) {
             notificationWarning(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
@@ -74,12 +91,27 @@ public class RunCodeRunner extends DefaultJavaProgramRunner {
             remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
             remoteConfigDialog.setVisible(true);
         }
-        String name = env.getProject().getName();
+        ConfigUtil.projectName= env.getProject().getName();
         JavaParameters parameters = ((JavaCommandLine) state).getJavaParameters();
         ParametersList parametersList = parameters.getVMParametersList();
+        for (String item : parametersList.getParameters()) {
+            TaintUtil.notificationWarning(item);
+            if (item.contains("dongtai.app.name=")){
+                String[] split = item.split("=");
+                String name = split[1].trim();
+                if (!name.equals("")&&name!=null){
+                    ConfigUtil.projectName=name;
+                }
+            }
+        }
         parametersList.add("-javaagent:" + TaintConstant.AGENT_PATH + "agent.jar");
-        parametersList.add("-Ddongtai.app.name=" + name);
-        parametersList.add("-Diast.server.mode=local");
+        parametersList.add("-Ddongtai.app.name=" +   ConfigUtil.projectName);
+        parametersList.add("-Ddongtai.app.create=true");
+        parametersList.add("-Ddongtai.server.token=" +ConfigUtil.getOpenApiToken() );
+        parametersList.add("-Ddongtai.log.level="+ConfigUtil.getLoglevel());
+        parametersList.add("-Ddongtai.server.url=" +ConfigUtil.getURL());
+        ConfigUtil.env=env;
+        TaintUtil.notificationWarning("Run With IAST 启动项目："   +ConfigUtil.projectName);
         return super.doExecuteAsync(state, env);
     }
 }

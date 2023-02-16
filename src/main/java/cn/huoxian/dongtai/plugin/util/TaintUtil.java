@@ -17,13 +17,13 @@ import java.util.regex.Pattern;
 import static cn.huoxian.dongtai.plugin.dialog.RemoteConfigDialog.isNewToken;
 
 /**
- * @author niuerzhuang@huoxian.cn
+ * @author Alex@huoxian.cn
  **/
 public class TaintUtil {
     private final static Pattern MAC_PATTERN = Pattern.compile("Mac.*");
 
     /**
-     * 写入配置文件内容
+     * 写入配置文件内容,RemoteConfigDialog添加的配置文件
      */
     public static void configWrite(Map<String, String> maps) {
         Properties properties = new Properties();
@@ -42,8 +42,6 @@ public class TaintUtil {
             for (String key : maps.keySet()) {
                 properties.setProperty(key, maps.get(key));
             }
-            IdeaPropertity.TOKEN=maps.get("TOKEN");
-            IdeaPropertity.URL=maps.get("URL");
             FileOutputStream fos = new FileOutputStream(file);
             properties.store(fos, null);
             fos.flush();
@@ -54,7 +52,7 @@ public class TaintUtil {
     }
 
     /**
-     * 获取配置文件内容
+     * 获取配置文件内容 RemoteConfigDialog添加的配置文件
      */
     public static Properties configRead() {
         try {
@@ -91,9 +89,10 @@ public class TaintUtil {
     }
 
     /**
-     * 解析配置文件内容
+     * 解析配置文件内容,每次读取文件
      */
     public static String config(String configName) {
+
         Properties properties = configRead();
         return properties.getProperty(configName);
     }
@@ -134,7 +133,8 @@ public class TaintUtil {
             file.mkdirs();
         }
         File file1 = new File(filePath + "agent.jar");
-        if ((!file1.exists()) || isNewToken) {
+        if ((!file1.exists())||file1.length()<=0 || isNewToken) {
+//        if ((!file1.exists())||file1.length()<=0) {
             isNewToken = false;
             FileOutputStream fileOut = null;
             HttpURLConnection conn = null;
@@ -180,13 +180,12 @@ public class TaintUtil {
     public static String fixUrl() {
         String url = "";
         try {
-            url = TaintUtil.config("AGENTURL");
+            url = TaintUtil.config("URL");
             String lastString = url.substring(url.length() - 1);
             if ("/".equals(lastString)) {
                 url = url.substring(0, url.length() - 1);
             }
         } catch (Exception e) {
-//            url = "http://openapi.iast.huoxian.cn:8000";
             url = "http://iast.io";
         }
         return url;

@@ -1,7 +1,7 @@
 package cn.huoxian.dongtai.plugin.util;/**
  * 文件描述
  *
- * @author angeltqs.alex
+ * @author Alex@huoxian.cn
  */
 
 import java.util.regex.Matcher;

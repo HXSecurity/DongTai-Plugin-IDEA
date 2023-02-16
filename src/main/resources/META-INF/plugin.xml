@@ -48,15 +48,15 @@
     </extensions>
 
     <actions>
-        <group id="DongTai IAST" text="DongTai IAST" popup="true" icon="DongTaiPluginIcons.DongTaiAction">
+        <group id="DongTai IAST" text="DongTai IAST" popup="true" icon="/assets/toolwindow.svg">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
             <action id="RemoteConfiguration" class="cn.huoxian.dongtai.plugin.action.RemoteConfigAction"
-                    text="配置云端" description="RemoteConfig">
+                    text="配置云端" description="RemoteConfig" icon="/assets/toolwindow.svg">
             </action>
         </group>
         <!-- Add your actions here -->
         <action id="StainConfig" class="cn.huoxian.dongtai.plugin.action.TaintConfigAction" text="添加 HOOK 规则"
-                description="StainConfig">
+                description="StainConfig" icon="/assets/toolwindow.svg">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="$Copy"/>
         </action>
     </actions>

@@ -54,9 +54,17 @@ public class GetJson {
         try {
             String utf8 = "UTF-8";
             String agentName = URLEncoder.encode(AgentMassage.getAgentToken(), utf8);
-//            String agentName =AgentMassage.config("engine.name");
-            agentName = agentName.replaceAll("/+", "%20");
-            String taintsAPI = config("URL") + TaintConstant.TAINTS_API_GET + "?name=" + agentName;
+            agentName=agentName.replaceAll("\\+",  "%20"); //处理空格
+            if (ConfigUtil.env==null){
+                return "";
+            }
+            String projectname=ConfigUtil.projectName;;
+            String departmenttoken=ConfigUtil.getOpenApiToken();
+            String taintsAPI = config("URL") + TaintConstant.TAINTS_API_GET +
+                    "?name=" + agentName+
+                    "&departmenttoken="+departmenttoken+
+                    "&projectname="+projectname;
+
             CloseableHttpClient client = HttpClients.createDefault();
             HttpGet get = new HttpGet(taintsAPI);
             RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(1000).setConnectTimeout(1000).build();
@@ -70,6 +78,7 @@ public class GetJson {
             String line;
             while ((line = reader.readLine()) != null) {
                 document.append(line);
+                TaintUtil.notificationWarning("taintsAPI"+taintsAPI+"-----/api/v1/plugin/vuln/list"+line);
             }
             reader.close();
             return document.toString();
@@ -82,7 +91,14 @@ public class GetJson {
         try {
             String utf8 = "UTF-8";
             String agentName = URLEncoder.encode(AgentMassage.getAgentToken(), utf8);
-            String taintsAPI = config("URL") + TaintConstant.TAINTS_COUNT_API_GET + "?name=" + agentName;
+            agentName=agentName.replaceAll("\\+",  "%20"); //处理空格
+            String projectname=ConfigUtil.projectName;
+            String departmenttoken=ConfigUtil.getOpenApiToken();
+
+            String taintsAPI = config("URL") + TaintConstant.TAINTS_COUNT_API_GET +
+                    "?name=" + agentName+
+                    "&departmenttoken="+departmenttoken+
+                    "&projectname="+projectname;
             CloseableHttpClient client = HttpClients.createDefault();
             HttpGet get = new HttpGet(taintsAPI);
             RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(1000).setConnectTimeout(1000).build();
@@ -96,6 +112,7 @@ public class GetJson {
             String line;
             while ((line = reader.readLine()) != null) {
                 document.append(line);
+                TaintUtil.notificationWarning("taintsAPI"+taintsAPI+"-----/api/v1/plugin/vuln/count"+line);
             }
             reader.close();
             return document.toString();
