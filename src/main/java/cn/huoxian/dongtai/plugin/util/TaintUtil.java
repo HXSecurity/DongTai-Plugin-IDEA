@@ -133,47 +133,45 @@ public class TaintUtil {
             file.mkdirs();
         }
         File file1 = new File(filePath + "agent.jar");
-        if ((!file1.exists())||file1.length()<=0 || isNewToken) {
-//        if ((!file1.exists())||file1.length()<=0) {
-            isNewToken = false;
-            FileOutputStream fileOut = null;
-            HttpURLConnection conn = null;
-            InputStream inputStream = null;
-            try {
-                System.out.println("start download");
-                URL httpUrl = new URL(url);
-                conn = (HttpURLConnection) httpUrl.openConnection();
-                conn.setRequestProperty("Content-type", "application/json; charset=utf-8");
-                String token = config("TOKEN");
-                conn.setRequestProperty("Authorization", "Token " + token);
-                conn.setDoInput(true);
-                conn.setDoOutput(true);
-                conn.setUseCaches(false);
-                conn.connect();
-                inputStream = conn.getInputStream();
-                BufferedInputStream bis = new BufferedInputStream(inputStream);
-                fileOut = new FileOutputStream(filePath + TaintConstant.AGENT_NAME);
-                BufferedOutputStream bos = new BufferedOutputStream(fileOut);
-                byte[] buf = new byte[4096];
-                int length = bis.read(buf);
-                while (length != -1) {
-                    bos.write(buf, 0, length);
-                    length = bis.read(buf);
+        if ((!file1.exists()) || file1.length() <= 0 || isNewToken) {
+                isNewToken = false;
+                FileOutputStream fileOut = null;
+                HttpURLConnection conn = null;
+                InputStream inputStream = null;
+                try {
+                    System.out.println("start download");
+                    URL httpUrl = new URL(url);
+                    conn = (HttpURLConnection) httpUrl.openConnection();
+                    conn.setRequestProperty("Content-type", "application/json; charset=utf-8");
+                    String token = config("TOKEN");
+                    conn.setRequestProperty("Authorization", "Token " + token);
+                    conn.setDoInput(true);
+                    conn.setDoOutput(true);
+                    conn.setUseCaches(false);
+                    conn.connect();
+                    inputStream = conn.getInputStream();
+                    BufferedInputStream bis = new BufferedInputStream(inputStream);
+                    fileOut = new FileOutputStream(filePath + TaintConstant.AGENT_NAME);
+                    BufferedOutputStream bos = new BufferedOutputStream(fileOut);
+                    byte[] buf = new byte[4096];
+                    int length = bis.read(buf);
+                    while (length != -1) {
+                        bos.write(buf, 0, length);
+                        length = bis.read(buf);
+                    }
+                    bos.close();
+                    bis.close();
+                    conn.disconnect();
+                    System.out.println("end download");
+                } catch (Exception e) {
+                    notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
+                    RemoteConfigDialog remoteConfigDialog = new RemoteConfigDialog();
+                    remoteConfigDialog.pack();
+                    remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
+                    remoteConfigDialog.setVisible(true);
                 }
-                bos.close();
-                bis.close();
-                conn.disconnect();
-                System.out.println("end download");
-            } catch (Exception e) {
-                notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
-                RemoteConfigDialog remoteConfigDialog = new RemoteConfigDialog();
-                remoteConfigDialog.pack();
-                remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
-                remoteConfigDialog.setVisible(true);
             }
         }
-    }
-
     /**
      * url规范化
      */

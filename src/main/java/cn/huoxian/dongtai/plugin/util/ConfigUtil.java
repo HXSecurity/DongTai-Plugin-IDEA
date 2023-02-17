@@ -4,6 +4,8 @@ package cn.huoxian.dongtai.plugin.util;/**
  * @author Alex@huoxian.cn
  */
 
+import cn.huoxian.dongtai.plugin.dialog.RemoteConfigDialog;
+import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.runners.ExecutionEnvironment;
 
 /**
@@ -32,6 +34,27 @@ public class ConfigUtil {
     }
     public  static String getLoglevel(){
         return TaintUtil.config("LOGLEVEL");
+    }
+    public  static String getProjectName(ExecutionEnvironment env, JavaParameters parametersList){
+        String projectName =env.getProject().getName();
+        for (String item : parametersList.getVMParametersList().getParameters()) {
+            TaintUtil.notificationWarning(item);
+            if (item.contains("dongtai.app.name=")){
+                String[] split = item.split("=");
+                String name = split[1].trim();
+                if (!name.equals("")&&name!=null){
+                    projectName=name;
+                }
+            }
+        }
+        if(RemoteConfigDialog.isNewTokenToProject){
+            if (projectName.equals(ConfigUtil.projectName)){
+                projectName=projectName+"01";
+                RemoteConfigDialog.isNewTokenToProject=false;
+            }
+        }
+        ConfigUtil.projectName=projectName;
+        return ConfigUtil.projectName;
     }
 
 }

@@ -24,6 +24,7 @@ public class RemoteConfigDialog extends JDialog {
     private JTextField agentUrl;
     private JComboBox logLevelcomboBox;
     public static boolean isNewToken = false;
+    public static boolean isNewTokenToProject = false;
     RemoteConfigDialog remoteConfigDialog = this;
     public RemoteConfigDialog() {
 
@@ -99,6 +100,7 @@ public class RemoteConfigDialog extends JDialog {
     }
 
     private void onOK() {
+        isNewTokenToProject=true;
         isNewToken = true;
         dispose();
     }
