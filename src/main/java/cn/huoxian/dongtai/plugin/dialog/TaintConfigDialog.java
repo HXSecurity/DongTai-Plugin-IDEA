@@ -1,7 +1,9 @@
 package cn.huoxian.dongtai.plugin.dialog;
 
+import cn.huoxian.dongtai.plugin.pojo.DongTaiResponse;
 import cn.huoxian.dongtai.plugin.util.GetJson;
 import cn.huoxian.dongtai.plugin.util.TaintConstant;
+import cn.huoxian.dongtai.plugin.util.TaintUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.JsonArray;
@@ -23,7 +25,9 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import static cn.huoxian.dongtai.plugin.util.TaintUtil.*;
 
@@ -31,6 +35,9 @@ import static cn.huoxian.dongtai.plugin.util.TaintUtil.*;
  * @author niuerzhuang@huoxian.cn
  */
 public class TaintConfigDialog extends JDialog {
+
+
+    private static final Logger logger = Logger.getLogger(TaintConfigDialog.class.getName());
     private JPanel contentPane;
     private JButton buttonOk;
     private JButton buttonCancel;
@@ -69,8 +76,17 @@ public class TaintConfigDialog extends JDialog {
     private String token;
     private int i = 0;
     private int j = 0;
-
+    TaintConfigDialog taintConfigDialog = this;
+    public  static HashMap<String, String> verifyMap = new HashMap<>();
+    static {
+        verifyMap.put("rule_type_id","规则类型");
+        verifyMap.put("rule_value","规则详情");
+        verifyMap.put("rule_source","污点来源");
+        verifyMap.put("rule_target","污点去向");
+        verifyMap.put("inherit","继承深度");
+    }
     public TaintConfigDialog(String methodSignature, String classKind) {
+
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOk);
@@ -306,6 +322,7 @@ public class TaintConfigDialog extends JDialog {
             json.put("rule_type_id", ruleMap.get(ruleTypeComboBox.getSelectedItem()));
             json.put("rule_value", methodSignature);
             json.put("language_id","1");
+
             StringBuilder s1 = new StringBuilder();
             String selectedItem = (String) taintSourceComboBox.getSelectedItem();
             if (TaintConstant.SOURCE_TYPE_OBJECT.equals(selectedItem)) {
@@ -316,7 +333,7 @@ public class TaintConfigDialog extends JDialog {
                 String parameterNum = taintSourceTextField.getText();
                 s1 = new StringBuilder("P" + parameterNum);
             }
-            for (int k = 0; k < i; k++) {
+            for (int k = 0; k <i; k++) {
                 JPanel component = (JPanel) taintSourceAddPanel.getComponent(k);
                 JComboBox<String> wdly1 = (JComboBox<String>) component.getComponent(0);
                 JComboBox<String> wdly2 = (JComboBox<String>) component.getComponent(1);
@@ -338,7 +355,7 @@ public class TaintConfigDialog extends JDialog {
                 json.put("rule_target", "P" + parameterNum);
                 s2 = new StringBuilder("P" + parameterNum);
             }
-            for (int k = 1; k < i; k++) {
+            for (int k = 1; k < j; k++) {
                 JPanel component = (JPanel) taintGoAddPanel.getComponent(k);
                 JComboBox<String> wdqx1 = (JComboBox<String>) component.getComponent(0);
                 JComboBox<String> wdqx2 = (JComboBox<String>) component.getComponent(1);
@@ -357,7 +374,51 @@ public class TaintConfigDialog extends JDialog {
                 json.put("inherit", "all");
             }
             json.put("track", "false");
-            String s = JSON.toJSONString(json);
+            //规则校验
+            Iterator iter = json.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry entry = (Map.Entry) iter.next();
+                //有参数
+                if (entry.getKey().equals("rule_source")||entry.getKey().equals("rule_target")){
+                    if (entry.getValue()==null||("").equals(entry.getValue())){
+                        new MsgTPDialog(TaintConfigDialog.this,"HOOK规则提示", true, "Sorry! "+verifyMap.get(entry.getKey())+" 必须填写，请重配置HOOK规则");
+                        return;
+                    }
+                    else {
+                        String parmeter = entry.getValue().toString();
+                        if (parmeter.contains("P")){
+                            //方便切片分割替换
+                            String parm = parmeter.replaceAll("\\|", "&");
+                            String[] split = parm.split("&");
+                            for (String s : split) {
+                                if (s.startsWith("P")){
+                                    if(s.length()%2==1){
+                                        new MsgTPDialog(TaintConfigDialog.this,"HOOK规则提示", true, "Sorry! "+verifyMap.get(entry.getKey())+"的参数编号"+" 必须填写，请重配置HOOK规则");
+                                        return;
+                                    }
+                                    else{
+                                        String p = s.substring(s.indexOf("P") + 1);
+                                        if (!isNumeric(p.substring(p.indexOf("P")+1))){
+                                            new MsgTPDialog(TaintConfigDialog.this,"HOOK规则提示", true, "Sorry! "+verifyMap.get(entry.getKey())+"的参数编号"+p+" 不是数字，请重配置HOOK规则");
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                //无参数
+                else{
+                    if (entry.getValue()==null||("").equals(entry.getValue())){
+                        if (verifyMap.containsKey(entry.getKey())){
+                            new MsgTPDialog(TaintConfigDialog.this,"HOOK规则提示", true, "Sorry! "+verifyMap.get(entry.getKey())+" 必须填写，请重配置HOOK规则");
+                            return;
+                        }
+                    }
+                }
+
+            }
             requestJson(url + TaintConstant.RULESET_API_RULE_ADD);
             onOk();
         });
@@ -393,9 +454,16 @@ public class TaintConfigDialog extends JDialog {
             post.setEntity(new StringEntity(json.toString(), StandardCharsets.UTF_8));
             HttpResponse httpResponse = client.execute(post);
             HttpEntity entity = httpResponse.getEntity();
-            System.err.println("状态:" + httpResponse.getStatusLine());
-            System.err.println("参数:" + EntityUtils.toString(entity));
-            notificationInfo(TaintConstant.NOTIFICATION_CONTENT_INFO_SUCCESS);
+            DongTaiResponse dongTaiResponse = JSON.parseObject(EntityUtils.toString(entity), DongTaiResponse.class);
+            String status = dongTaiResponse.getStatus();
+            TaintUtil.infoToIdeaDubug(url+"--->"+dongTaiResponse.toString());
+            logger.info(dongTaiResponse.toString());
+            if (status.equals(TaintConstant.REQUEST_JSON_SUCCESS_STATUS)){
+                notificationInfo(TaintConstant.NOTIFICATION_CONTENT_INFO_SUCCESS);
+            }
+            else{
+                notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_COMPLETE);
+            }
         } catch (IOException e1) {
             notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
         }

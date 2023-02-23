@@ -23,6 +23,7 @@ public class RemoteConfigDialog extends JDialog {
     private JTextField serverTokenTextArea;
     private JTextField agentUrl;
     private JComboBox logLevelcomboBox;
+    private JTextField projectNameTextArea;
     public static boolean isNewToken = false;
     public static boolean isNewTokenToProject = false;
     RemoteConfigDialog remoteConfigDialog = this;
@@ -39,12 +40,20 @@ public class RemoteConfigDialog extends JDialog {
             agentUrl.setText(agentUrlStr);
         }
         String openApiToken = config("OPENAPITOKEN");
-        openApiTokenTextArea.setText(openApiToken);
+        if (openApiToken == null || ("").equals(openApiToken)) {
+            openApiTokenTextArea.setText(TaintConstant.OPENAPITOKEN);
+        } else {
+            openApiTokenTextArea.setText(openApiToken);
+        }
         String serverToken = config("TOKEN");
-        if (openApiToken == null || "".equals(serverToken)) {
+        if (serverToken == null || "".equals(serverToken)) {
             serverTokenTextArea.setText(TaintConstant.TOKEN);
         } else {
             serverTokenTextArea.setText(serverToken);
+        }
+        String projectname = config("PROJECTNAME");
+        if (projectname != null &&!"".equals(projectname)) {
+            projectNameTextArea.setText(projectname);
         }
         buttonOK.addActionListener(new ActionListener() {
             @Override
@@ -52,6 +61,7 @@ public class RemoteConfigDialog extends JDialog {
                 String serverToken = serverTokenTextArea.getText();
                 String openApitoken = openApiTokenTextArea.getText();
                 String url = agentUrl.getText();
+                String projectName = projectNameTextArea.getText();
                 if (serverToken==null||serverToken.equals("")){
                     TaintUtil.notificationWarning("serverToker不能为空，请重配置IAST云端！");
                     new MsgTPDialog(remoteConfigDialog, "IAST云端提示", true, "Sorry! serverToker必须填写，请重配置IAST云端！!");
@@ -62,10 +72,16 @@ public class RemoteConfigDialog extends JDialog {
                     TaintUtil.notificationWarning("url不能为空，请重配置IAST云端！");
                     return;
                 }
+                if (openApitoken==null||openApitoken.equals("")){
+                    new MsgTPDialog(remoteConfigDialog, "IAST云端提示", true, "Sorry! openApitoken必须填写，请重配置IAST云端");
+                    TaintUtil.notificationWarning("openApitoken不能为空，请重配置IAST云端！");
+                    return;
+                }
                 Map<String, String> remoteConfig = new HashMap<>(2);
                 remoteConfig.put("URL", url);
                 remoteConfig.put("TOKEN", serverToken);
                 remoteConfig.put("OPENAPITOKEN", openApitoken);
+                remoteConfig.put("PROJECTNAME", projectName);
                 String logLevel = String.valueOf(logLevelcomboBox.getSelectedItem());
                 if (!logLevel.equals("请选择等级类型")){
                     remoteConfig.put("LOGLEVEL", logLevel);
@@ -73,8 +89,8 @@ public class RemoteConfigDialog extends JDialog {
                 else{
                     remoteConfig.put("LOGLEVEL", "info");
                 }
-
                 configWrite(remoteConfig);
+                TaintUtil.infoToIdeaDubug("写入DongTaiConfig.properties文件--->"+remoteConfig);
                 onOK();
             }
         });

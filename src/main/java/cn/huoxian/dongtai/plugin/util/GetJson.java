@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Logger;
 
 import static cn.huoxian.dongtai.plugin.util.TaintUtil.config;
 
@@ -22,10 +23,14 @@ import static cn.huoxian.dongtai.plugin.util.TaintUtil.config;
  * @author niuerzhuang@huoxian.cn
  **/
 public class GetJson {
+
+    private static final Logger logger = Logger.getLogger(GetJson.class.getName());
+
     /**
      * 获取规则集的 Json 字符串
      */
     public static String getRuleJson(int type) {
+
         String dongTaiUrlStr = config("URL") + TaintConstant.RULESET_API_RULE_TYPE + type;
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(dongTaiUrlStr);
@@ -44,6 +49,7 @@ public class GetJson {
             }
             reader.close();
             JSONObject jsonObject = JSONObject.parseObject(document.toString());
+            TaintUtil.infoToIdeaDubug("taintsAPI"+dongTaiUrlStr+"----->"+jsonObject.toJSONString());
             return jsonObject.toJSONString();
         } catch (IOException ignore) {
         }
@@ -78,7 +84,8 @@ public class GetJson {
             String line;
             while ((line = reader.readLine()) != null) {
                 document.append(line);
-                TaintUtil.notificationWarning("taintsAPI"+taintsAPI+"-----/api/v1/plugin/vuln/list"+line);
+                logger.info("taintsAPI"+taintsAPI+"-----/api/v1/plugin/vuln/list"+line);
+                TaintUtil.infoToIdeaDubug("taintsAPI"+taintsAPI+"-----/api/v1/plugin/vuln/list"+line);
             }
             reader.close();
             return document.toString();
@@ -112,7 +119,8 @@ public class GetJson {
             String line;
             while ((line = reader.readLine()) != null) {
                 document.append(line);
-                TaintUtil.notificationWarning("taintsAPI"+taintsAPI+"-----/api/v1/plugin/vuln/count"+line);
+                logger.info("taintsAPI"+taintsAPI+"-----/api/v1/plugin/vuln/count"+line);
+                TaintUtil.infoToIdeaDubug("taintsAPI"+taintsAPI+"-----/api/v1/plugin/vuln/count"+line);
             }
             reader.close();
             return document.toString();

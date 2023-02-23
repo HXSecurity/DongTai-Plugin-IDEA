@@ -49,7 +49,7 @@
           </hspacer>
         </children>
       </grid>
-      <grid id="e3588" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="e3588" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -83,7 +83,7 @@
             </constraints>
             <properties>
               <text value=""/>
-              <toolTipText value="非必填"/>
+              <toolTipText value="必填"/>
             </properties>
           </component>
           <component id="14f5d" class="javax.swing.JTextField" binding="serverTokenTextArea">
@@ -94,7 +94,9 @@
                 <maximum-size width="300" height="-1"/>
               </grid>
             </constraints>
-            <properties/>
+            <properties>
+              <toolTipText value="必填"/>
+            </properties>
           </component>
           <component id="ae174" class="javax.swing.JTextField" binding="agentUrl">
             <constraints>
@@ -106,6 +108,7 @@
             </constraints>
             <properties>
               <text value=""/>
+              <toolTipText value="必填"/>
             </properties>
           </component>
           <component id="c430a" class="javax.swing.JLabel">
@@ -119,7 +122,7 @@
           <grid id="640a2" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties/>
             <border type="none"/>
@@ -151,10 +154,32 @@
           </grid>
           <component id="d3024" class="javax.swing.JLabel">
             <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="日志等级"/>
+            </properties>
+          </component>
+          <component id="bcb1c" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="项目名称"/>
+              <toolTipText value="非必填"/>
+            </properties>
+          </component>
+          <component id="6669e" class="javax.swing.JTextField" binding="projectNameTextArea">
+            <constraints>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <minimum-size width="300" height="-1"/>
+                <preferred-size width="200" height="-1"/>
+                <maximum-size width="300" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <enabled value="true"/>
+              <toolTipText value="非必填(非兼容Idea的使用)"/>
             </properties>
           </component>
         </children>

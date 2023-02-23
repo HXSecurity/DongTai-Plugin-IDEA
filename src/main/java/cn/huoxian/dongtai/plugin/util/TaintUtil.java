@@ -12,6 +12,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import static cn.huoxian.dongtai.plugin.dialog.RemoteConfigDialog.isNewToken;
@@ -21,11 +23,14 @@ import static cn.huoxian.dongtai.plugin.dialog.RemoteConfigDialog.isNewToken;
  **/
 public class TaintUtil {
     private final static Pattern MAC_PATTERN = Pattern.compile("Mac.*");
+    private static final Logger logger = Logger.getLogger(TaintUtil.class.getName());
+    public static  boolean isTrace=false;
 
     /**
      * 写入配置文件内容,RemoteConfigDialog添加的配置文件
      */
     public static void configWrite(Map<String, String> maps) {
+
         Properties properties = new Properties();
         try {
             File file;
@@ -123,6 +128,17 @@ public class TaintUtil {
         Notification notification = notificationGroup.createNotification(content, MessageType.INFO);
         Notifications.Bus.notify(notification);
     }
+    /**
+     * 普通通知
+     */
+    public static void infoToIdeaDubug(String content) {
+        if (isTrace){
+            NotificationGroup notificationGroup = new NotificationGroup("Custom Notification Group", NotificationDisplayType.BALLOON, true);
+            Notification notification = notificationGroup.createNotification(content, MessageType.INFO);
+            Notifications.Bus.notify(notification);
+        }
+
+    }
 
     /**
      * 下载 agrnt.jar
@@ -134,44 +150,53 @@ public class TaintUtil {
         }
         File file1 = new File(filePath + "agent.jar");
         if ((!file1.exists()) || file1.length() <= 0 || isNewToken) {
-                isNewToken = false;
-                FileOutputStream fileOut = null;
-                HttpURLConnection conn = null;
-                InputStream inputStream = null;
-                try {
-                    System.out.println("start download");
-                    URL httpUrl = new URL(url);
-                    conn = (HttpURLConnection) httpUrl.openConnection();
-                    conn.setRequestProperty("Content-type", "application/json; charset=utf-8");
-                    String token = config("TOKEN");
-                    conn.setRequestProperty("Authorization", "Token " + token);
-                    conn.setDoInput(true);
-                    conn.setDoOutput(true);
-                    conn.setUseCaches(false);
-                    conn.connect();
-                    inputStream = conn.getInputStream();
-                    BufferedInputStream bis = new BufferedInputStream(inputStream);
-                    fileOut = new FileOutputStream(filePath + TaintConstant.AGENT_NAME);
-                    BufferedOutputStream bos = new BufferedOutputStream(fileOut);
-                    byte[] buf = new byte[4096];
-                    int length = bis.read(buf);
-                    while (length != -1) {
-                        bos.write(buf, 0, length);
-                        length = bis.read(buf);
-                    }
-                    bos.close();
-                    bis.close();
-                    conn.disconnect();
-                    System.out.println("end download");
-                } catch (Exception e) {
-                    notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
-                    RemoteConfigDialog remoteConfigDialog = new RemoteConfigDialog();
-                    remoteConfigDialog.pack();
-                    remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
-                    remoteConfigDialog.setVisible(true);
+            isNewToken = false;
+            FileOutputStream fileOut = null;
+            HttpURLConnection conn = null;
+            InputStream inputStream = null;
+            try {
+                infoToIdeaDubug("start download");
+                URL httpUrl = new URL(url);
+                infoToIdeaDubug("下载的url："+url);
+                infoToIdeaDubug("下载到的路径：："+filePath);
+                logger.log(Level.OFF,"下载的url："+url);
+                conn = (HttpURLConnection) httpUrl.openConnection();
+                conn.setRequestProperty("Content-type", "application/json; charset=utf-8");
+                String token = config("TOKEN");
+                conn.setRequestProperty("Authorization", "Token " + token);
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                conn.setUseCaches(false);
+                conn.connect();
+                inputStream = conn.getInputStream();
+                if (inputStream==null){
+                    notificationWarning(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
                 }
+                BufferedInputStream bis = new BufferedInputStream(inputStream);
+                fileOut = new FileOutputStream(filePath + TaintConstant.AGENT_NAME);
+                infoToIdeaDubug("重新下载agent包："+filePath + TaintConstant.AGENT_NAME);
+                BufferedOutputStream bos = new BufferedOutputStream(fileOut);
+                byte[] buf = new byte[4096];
+                int length = bis.read(buf);
+                while (length != -1) {
+                    bos.write(buf, 0, length);
+                    length = bis.read(buf);
+                }
+                bos.close();
+                bis.close();
+                conn.disconnect();
+                System.out.println("end download");
+                infoToIdeaDubug("end download");
+            } catch (Exception e) {
+                notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
+                RemoteConfigDialog remoteConfigDialog = new RemoteConfigDialog();
+                remoteConfigDialog.pack();
+                remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
+                remoteConfigDialog.setVisible(true);
             }
         }
+    }
+
     /**
      * url规范化
      */
@@ -199,5 +224,16 @@ public class TaintUtil {
         } else {
             return TaintConstant.AGENT_PATH_WINDOWS;
         }
+    }
+
+    public static boolean isNull(String str) {
+        return str != null || !("").equals(str);
+    }
+    public static boolean isNumeric(String str) {
+        if (str == null) {
+            return false;
+        }
+        Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+        return pattern.matcher(str).matches();
     }
 }

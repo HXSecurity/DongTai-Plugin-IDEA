@@ -10,6 +10,7 @@ import cn.huoxian.dongtai.plugin.util.TaintConstant;
 import cn.huoxian.dongtai.plugin.util.TaintUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,11 +18,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 /**
  * @author niuerzhuang@huoxian.cn
@@ -40,6 +44,7 @@ public class TaintListWindow {
     private String json = "";
     private int size;
     Timer timer ;
+    private static final Logger logger = Logger.getLogger(TaintListWindow.class.getName());
 
     public TaintListWindow() {
         init();
@@ -83,10 +88,9 @@ public class TaintListWindow {
                     int selectedRow = contentTable.getSelectedRow();
                     Taint taint = taints.get(selectedRow);
                     String detail = taint.getDetail();
-                    Desktop desktop = Desktop.getDesktop();
-                    URI uri = new URI(detail);
-                    desktop.browse(uri);
+                    browseURL(detail);
                 } catch (Exception e) {
+                    TaintUtil.notificationError("sorry，系统不支持打开浏览器！");
                 }
             }
         });
@@ -114,17 +118,18 @@ public class TaintListWindow {
         removeAll();
         json = GetJson.getTaintsJson();
         taints = getTaints(json);
-        TaintUtil.notificationWarning("taints"+taints);
+        logger.info("taints->"+taints);
+        TaintUtil.infoToIdeaDubug("taints->"+taints);
         try {
             size = taints.size();
             for (Taint taint : taints
             ) {
 
-                taint.setDetail(TaintConstant.TAINT_DETAIL + taint.getId());
+                taint.setDetail( TaintUtil.fixUrl()+TaintConstant.TAINT_DETAIL + taint.getId());
                 TaintConstant.TABLE_MODEL.addRow(TaintConvert.convert(taint));
             }
         } catch (Exception e) {
-            TaintUtil.notificationWarning("长度为"+size);
+            TaintUtil.infoToIdeaDubug("长度为"+size);
             size = 0;
 
         }
@@ -172,8 +177,12 @@ public class TaintListWindow {
         try {
              responseTaint = JSONObject.parseObject(json, ResponseTaint.class);
             if (responseTaint.getStatus().equals(TaintConstant.REQUEST_JSON_ERROR_STATUS)){
-                TaintUtil.notificationWarning(responseTaint.getMsg());
-                new WarnDialog(responseTaint.getMsg());
+                if(responseTaint.getMsg().equals("responseTaint.getMsg()")){
+                    TaintUtil.notificationWarning("Iast云端配制有误，Agent不存在！");
+                }
+               else {
+                    TaintUtil.notificationWarning(responseTaint.getMsg());
+                }
             }
             return responseTaint.getData();
         } catch (Exception exception) {
@@ -186,8 +195,12 @@ public class TaintListWindow {
         try {
             responseTaintCount = JSONObject.parseObject(json, ResponseTaintCount.class);
             if (responseTaintCount.getStatus().equals(TaintConstant.REQUEST_JSON_ERROR_STATUS)){
-                TaintUtil.notificationWarning(responseTaintCount.getMsg());
-                new WarnDialog(responseTaintCount.getMsg());
+                if(responseTaintCount.getMsg().equals("responseTaint.getMsg()")){
+                    TaintUtil.notificationWarning("Iast云端配制有误，Agent不存在！");
+                }
+                else {
+                    TaintUtil.notificationWarning(responseTaintCount.getMsg());
+                }
                 return null;
             }
             return responseTaintCount.getCount();
@@ -247,6 +260,28 @@ public class TaintListWindow {
             ) {
                 TaintConstant.TABLE_MODEL.addRow(TaintConvert.convert(level));
             }
+        }
+    }
+    public void browseURL(String urlString) {
+
+        try {
+            if (SystemUtils.IS_OS_LINUX) {
+                if (Runtime.getRuntime().exec(new String[] { "which", "xdg-open" }).getInputStream().read() != -1) {
+                    Runtime.getRuntime().exec(new String[] { "xdg-open", urlString });
+                } else {
+                    TaintUtil.notificationError("sorry，系统不支持打开浏览器！");
+                }
+            } else {
+                if (Desktop.isDesktopSupported())
+                {
+                    Desktop.getDesktop().browse(new URI(urlString));
+                } else {
+                    TaintUtil.notificationError("sorry，系统不支持打开浏览器！");
+                }
+            }
+
+        } catch (IOException | URISyntaxException e) {
+            TaintUtil.notificationError("sorry，系统不支持打开浏览器！");
         }
     }
 }

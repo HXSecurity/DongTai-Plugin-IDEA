@@ -4,6 +4,8 @@ package cn.huoxian.dongtai.plugin.dialog;/**
  * @author Alex@huoxian.cn
  */
 
+import cn.huoxian.dongtai.plugin.util.TaintUtil;
+
 import javax.swing.*;
 
 /**
@@ -13,12 +15,13 @@ import javax.swing.*;
  */
 public class MsgTPDialog extends JDialog {
 
-    public MsgTPDialog(RemoteConfigDialog jf, String title, boolean flag, String info) {
+    public MsgTPDialog(JDialog jf, String title, boolean flag, String info) {
 
         super(jf, title, flag); //调用父类的构造器
+        TaintUtil.notificationError(title+"："+info);
         JLabel jl = new JLabel(info);
         add(jl);
-        setSize(310, 150);//大小
+        setSize(350, 150);//大小
 
         setLocationRelativeTo(null);//居中
 

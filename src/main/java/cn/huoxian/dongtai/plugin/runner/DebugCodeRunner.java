@@ -17,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.concurrency.Promise;
 
+import java.util.logging.Logger;
+
 import static cn.huoxian.dongtai.plugin.util.TaintUtil.downloadAgent;
 import static cn.huoxian.dongtai.plugin.util.TaintUtil.notificationWarning;
 
@@ -24,7 +26,7 @@ import static cn.huoxian.dongtai.plugin.util.TaintUtil.notificationWarning;
  * @author niuerzhuang@huoxian.cn
  **/
 public class DebugCodeRunner extends GenericDebuggerRunner {
-
+    private static final Logger logger = Logger.getLogger(RunCodeRunner.class.getName());
     @NotNull
     @Override
     public String getRunnerId() {
@@ -44,7 +46,9 @@ public class DebugCodeRunner extends GenericDebuggerRunner {
 
     @Override
     protected RunContentDescriptor doExecute(@NotNull RunProfileState state, @NotNull ExecutionEnvironment env) throws ExecutionException {
-
+        JavaParameters parameters = ((JavaCommandLine) state).getJavaParameters();
+        ParametersList parametersList = parameters.getVMParametersList();
+        ConfigUtil.loadProperties(parameters);
         try {
             downloadAgent(TaintConstant.AGENT_URL, TaintConstant.AGENT_PATH);
         } catch (Exception e) {
@@ -54,20 +58,23 @@ public class DebugCodeRunner extends GenericDebuggerRunner {
             remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
             remoteConfigDialog.setVisible(true);
         }
-        JavaParameters parameters = ((JavaCommandLine) state).getJavaParameters();
-        ParametersList parametersList = parameters.getVMParametersList();
-        parametersList.add("-javaagent:" + TaintConstant.AGENT_PATH + "agent.jar");
+        parametersList.add( ConfigUtil.getJavaAgent());
         parametersList.add("-Ddongtai.app.name=" +   ConfigUtil.getProjectName(env,parameters));
         parametersList.add("-Ddongtai.server.token=" +ConfigUtil.getOpenApiToken() );
         parametersList.add("-Ddongtai.log.level="+ConfigUtil.getLoglevel());
         parametersList.add("-Ddongtai.server.url=" +ConfigUtil.getURL());
         ConfigUtil.env=env;
-        TaintUtil.notificationWarning("Run With IAST 启动项目："   +ConfigUtil.projectName);
+        logger.info("IDEA"+ConfigUtil.getRunerIdeaVersion()+"Run With IAST 启动项目："   +ConfigUtil.projectName);
+        TaintUtil.notificationWarning("IDEA："+ConfigUtil.getRunerIdeaVersion()+"Run With IAST 启动项目："   +ConfigUtil.projectName);
         return super.doExecute(state, env);
+
     }
     @Override
     protected @NotNull Promise<@Nullable RunContentDescriptor> doExecuteAsync(@NotNull TargetEnvironmentAwareRunProfileState state, @NotNull ExecutionEnvironment env) throws ExecutionException {
         System.out.println("start run doExecuteAsync");
+        JavaParameters parameters = ((JavaCommandLine) state).getJavaParameters();
+        ParametersList parametersList = parameters.getVMParametersList();
+        ConfigUtil.loadProperties(parameters);
         try {
 
             downloadAgent(TaintConstant.AGENT_URL, TaintConstant.AGENT_PATH);
@@ -78,15 +85,15 @@ public class DebugCodeRunner extends GenericDebuggerRunner {
             remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
             remoteConfigDialog.setVisible(true);
         }
-        JavaParameters parameters = ((JavaCommandLine) state).getJavaParameters();
-        ParametersList parametersList = parameters.getVMParametersList();
-        parametersList.add("-javaagent:" + TaintConstant.AGENT_PATH + "agent.jar");
+
+        parametersList.add(ConfigUtil.getJavaAgent());
         parametersList.add("-Ddongtai.app.name=" +   ConfigUtil.getProjectName(env,parameters));
         parametersList.add("-Ddongtai.server.token=" +ConfigUtil.getOpenApiToken() );
         parametersList.add("-Ddongtai.log.level="+ConfigUtil.getLoglevel());
         parametersList.add("-Ddongtai.server.url=" +ConfigUtil.getURL());
         ConfigUtil.env=env;
-        TaintUtil.notificationWarning("Run With IAST 启动项目："   +ConfigUtil.projectName);
+        logger.info("IDEA"+ConfigUtil.getRunerIdeaVersion()+"Run With IAST 启动项目："   +ConfigUtil.projectName);
+        TaintUtil.notificationWarning("IDEA："+ConfigUtil.getRunerIdeaVersion()+"Run With IAST 启动项目："   +ConfigUtil.projectName);
         return super.doExecuteAsync(state, env);
     }
 }

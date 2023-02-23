@@ -63,7 +63,7 @@ public interface TaintConstant {
 
     String URL = TaintUtil.fixUrl();
 
-    String AGENT_URL = URL + "/api/v1/agent/download?url=" + URL + "&language=java";
+    String AGENT_URL = URL + "/api/v1/agent/download?url=" + URL+"/openapi" + "&language=java";
 
     String AGENT_PATH_MAC = PROPERTY + "/Library/iastagent/";
 
@@ -78,7 +78,7 @@ public interface TaintConstant {
 
     DefaultTableModel TABLE_MODEL = new DefaultTableModel(null, COLUMN_NAME);
 
-    String TAINT_DETAIL = "https://iast.huoxian.cn/vuln/vulnDetail/1/";
+    String TAINT_DETAIL = "/vuln/vulnDetail/1/";
 
     String AGENT_PATH = TaintUtil.os();
 
@@ -87,7 +87,7 @@ public interface TaintConstant {
     String TOKEN="1f6b147d1790d2226e49ae6b822d83f2f911b55b";
     String LOGLEVEL="info";
     String OPENAPITOKEN="1f6b147d1790d2226e49ae6b822d83f2f911b55b";
-    String DEFAULT_URL = "http://iast-test.huoxian.cn";
-    String DEFAULT_AGENT_URL = "http://iast-test.huoxian.cn";
+    String DEFAULT_URL = "https://iast-test.huoxian.cn";
+    String DEFAULT_AGENT_URL = "https://iast-test.huoxian.cn";
 
 }
