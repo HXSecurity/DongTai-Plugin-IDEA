@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static cn.huoxian.dongtai.plugin.util.TaintUtil.notificationWarning;
+
 /**
  *Author:Alex@huoxian.cn
  * @date 2023年02月15日 16:23
@@ -176,5 +178,14 @@ public class ConfigUtil {
                     break;
                 }
             }
+    }
+    public static void showRemoteConfigDialog(){
+        TaintUtil.notificationError("download fail");
+        TaintUtil.notificationError("agent.jar有误，项目启动失败，请重新检查配置或选择清空agent缓存");
+        notificationWarning(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
+        RemoteConfigDialog remoteConfigDialog = new RemoteConfigDialog();
+        remoteConfigDialog.pack();
+        remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
+        remoteConfigDialog.setVisible(true);
     }
 }

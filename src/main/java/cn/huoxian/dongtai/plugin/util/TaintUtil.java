@@ -19,13 +19,19 @@ import java.util.regex.Pattern;
 import static cn.huoxian.dongtai.plugin.dialog.RemoteConfigDialog.isNewToken;
 
 /**
- * @author Alex@huoxian.cn
+ * @author tanqiansheng@huoxian.cn
  **/
 public class TaintUtil {
     private final static Pattern MAC_PATTERN = Pattern.compile("Mac.*");
     private static final Logger logger = Logger.getLogger(TaintUtil.class.getName());
     public static  boolean isTrace=false;
-
+    public static  boolean isErrorStop=false;
+    static {
+        String level= TaintUtil.config("LOGLEVEL");
+        if (level!=null&&!("trace").equals(level)){
+            isTrace=true;
+        }
+    }
     /**
      * 写入配置文件内容,RemoteConfigDialog添加的配置文件
      */
@@ -129,7 +135,7 @@ public class TaintUtil {
         Notifications.Bus.notify(notification);
     }
     /**
-     * 普通通知
+     * 普通通知 Trace生效
      */
     public static void infoToIdeaDubug(String content) {
         if (isTrace){
@@ -149,13 +155,16 @@ public class TaintUtil {
             file.mkdirs();
         }
         File file1 = new File(filePath + "agent.jar");
-        if ((!file1.exists()) || file1.length() <= 0 || isNewToken) {
+        if ((!file1.exists()) || file1.length() == 0 || isNewToken) {
             isNewToken = false;
             FileOutputStream fileOut = null;
             HttpURLConnection conn = null;
             InputStream inputStream = null;
             try {
-                infoToIdeaDubug("start download");
+                if (file1.exists()){
+                    file1.delete();
+                }
+                infoToIdeaDubug("Start download");
                 URL httpUrl = new URL(url);
                 infoToIdeaDubug("下载的url："+url);
                 infoToIdeaDubug("下载到的路径：："+filePath);
@@ -174,7 +183,7 @@ public class TaintUtil {
                 }
                 BufferedInputStream bis = new BufferedInputStream(inputStream);
                 fileOut = new FileOutputStream(filePath + TaintConstant.AGENT_NAME);
-                infoToIdeaDubug("重新下载agent包："+filePath + TaintConstant.AGENT_NAME);
+                infoToIdeaDubug("重新下载Agent包："+filePath + TaintConstant.AGENT_NAME);
                 BufferedOutputStream bos = new BufferedOutputStream(fileOut);
                 byte[] buf = new byte[4096];
                 int length = bis.read(buf);
@@ -185,14 +194,28 @@ public class TaintUtil {
                 bos.close();
                 bis.close();
                 conn.disconnect();
-                System.out.println("end download");
-                infoToIdeaDubug("end download");
+                infoToIdeaDubug("End download");
+                if (!file1.exists() || file1.length() <= 0){
+                    ConfigUtil.showRemoteConfigDialog();
+                    if (!isErrorStop){
+                        downloadAgent(url,filePath);
+
+                    }else{
+                        //停止循环
+                        isErrorStop=false;
+                       return;
+                    }
+
+                }
             } catch (Exception e) {
-                notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_FAILURE);
-                RemoteConfigDialog remoteConfigDialog = new RemoteConfigDialog();
-                remoteConfigDialog.pack();
-                remoteConfigDialog.setTitle(TaintConstant.NAME_DONGTAI_IAST_RULE);
-                remoteConfigDialog.setVisible(true);
+                ConfigUtil.showRemoteConfigDialog();
+                if (!isErrorStop){
+                    downloadAgent(url,filePath);
+                }else{
+                    //停止循环
+                    isErrorStop=false;
+                    return;
+                }
             }
         }
     }

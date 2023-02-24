@@ -11,7 +11,7 @@ import java.io.File;
 /**
  * 文件描述
  *
- * @author Alex@huoxian.cn
+ * @author tanqiansheng@huoxian.cn
  */
 public class ClearCacheAction extends AnAction {
 
@@ -30,7 +30,7 @@ public class ClearCacheAction extends AnAction {
                 TaintUtil.notificationInfo("清空缓存成功！");
             }
             else{
-                TaintUtil.notificationInfo("文件已经被占用，请重启项目清空缓存！");
+                TaintUtil.notificationInfo("文件已经被占用，重启项目将清空缓存！");
             }
         }
     }

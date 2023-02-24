@@ -6,14 +6,14 @@ import cn.huoxian.dongtai.plugin.util.TaintUtil;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
-import static cn.huoxian.dongtai.plugin.util.TaintUtil.config;
 import static cn.huoxian.dongtai.plugin.util.TaintUtil.configWrite;
 
 /**
- * @author niuerzhuang@huoxian.cn
+ * @author tanqiansheng@huoxian.cn
  */
 public class RemoteConfigDialog extends JDialog {
     private JPanel contentPane;
@@ -33,27 +33,32 @@ public class RemoteConfigDialog extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         setCenter();
-        String agentUrlStr = config("URL");
+        Properties properties = TaintUtil.configRead();
+        String agentUrlStr = properties.getProperty("URL");
         if (agentUrlStr == null || "".equals(agentUrlStr)) {
             agentUrl.setText(TaintConstant.DEFAULT_AGENT_URL);
         } else {
             agentUrl.setText(agentUrlStr);
         }
-        String openApiToken = config("OPENAPITOKEN");
+        String openApiToken = properties.getProperty("OPENAPITOKEN");
         if (openApiToken == null || ("").equals(openApiToken)) {
             openApiTokenTextArea.setText(TaintConstant.OPENAPITOKEN);
         } else {
             openApiTokenTextArea.setText(openApiToken);
         }
-        String serverToken = config("TOKEN");
+        String serverToken =properties.getProperty("TOKEN");
         if (serverToken == null || "".equals(serverToken)) {
             serverTokenTextArea.setText(TaintConstant.TOKEN);
         } else {
             serverTokenTextArea.setText(serverToken);
         }
-        String projectname = config("PROJECTNAME");
+        String projectname = properties.getProperty("PROJECTNAME");
         if (projectname != null &&!"".equals(projectname)) {
             projectNameTextArea.setText(projectname);
+        }
+        String logLevel = properties.getProperty("LOGLEVEL");
+        if (logLevel != null &&!"".equals(logLevel)) {
+            logLevelcomboBox.setSelectedItem(logLevel);
         }
         buttonOK.addActionListener(new ActionListener() {
             @Override
@@ -77,7 +82,7 @@ public class RemoteConfigDialog extends JDialog {
                     TaintUtil.notificationWarning("openApitoken不能为空，请重配置IAST云端！");
                     return;
                 }
-                Map<String, String> remoteConfig = new HashMap<>(2);
+                Map<String, String> remoteConfig = new LinkedHashMap<>(8);
                 remoteConfig.put("URL", url);
                 remoteConfig.put("TOKEN", serverToken);
                 remoteConfig.put("OPENAPITOKEN", openApitoken);
@@ -88,6 +93,13 @@ public class RemoteConfigDialog extends JDialog {
                 }
                 else{
                     remoteConfig.put("LOGLEVEL", "info");
+                }
+                //打印通知
+                if (logLevel.equals("trace")){
+                    TaintUtil.isTrace=true;
+                }
+                else{
+                    TaintUtil.isTrace=false;
                 }
                 configWrite(remoteConfig);
                 TaintUtil.infoToIdeaDubug("写入DongTaiConfig.properties文件--->"+remoteConfig);
@@ -122,7 +134,14 @@ public class RemoteConfigDialog extends JDialog {
     }
 
     private void onCancel() {
-        dispose();
+        // 确认用户是否想要关闭对话框
+        int option = JOptionPane.showConfirmDialog(this, "确定要关闭配置云端吗？配置有误项目将无法启动！", "关闭配置云端", JOptionPane.YES_NO_OPTION);
+        if (option == JOptionPane.YES_OPTION) {
+            // 关闭对话框
+            TaintUtil.isErrorStop=true;
+            dispose();
+        }
+
     }
 
     /**

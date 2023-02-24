@@ -1,7 +1,7 @@
 package cn.huoxian.dongtai.plugin.dialog;/**
  * 文件描述
  *
- * @author Alex@huoxian.cn
+ * @author tanqiansheng@huoxian.cn
  */
 
 import com.intellij.openapi.ui.DialogWrapper;
@@ -11,7 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- *Author:Alex@huoxian.cn
+ *Author:tanqiansheng@huoxian.cn
  * @date 2023年02月15日 15:50
  *Description:乾坤未定，你我皆是黑马。
  */

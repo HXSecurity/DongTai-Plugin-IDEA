@@ -229,6 +229,7 @@ public class TaintListWindow {
         List<Taint> levels = new ArrayList<>();
         for (Taint taint : taints
         ) {
+
             String level = taint.getLevel();
             if (StringUtils.containsIgnoreCase(level, requirement)) {
                 levels.add(taint);

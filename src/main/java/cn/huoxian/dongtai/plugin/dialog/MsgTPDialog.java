@@ -9,7 +9,7 @@ import cn.huoxian.dongtai.plugin.util.TaintUtil;
 import javax.swing.*;
 
 /**
- *Author:Alex@huoxian.cn
+ *Author:tanqiansheng@huoxian.cn
  * @date 2023年02月16日 14:42
  *Description:乾坤未定，你我皆是黑马。
  */

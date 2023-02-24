@@ -7,7 +7,7 @@ import com.sun.istack.NotNull;
 import javax.swing.*;
 
 /**
- * @author niuerzhuang@huoxian.cn
+ * @author tanqiansheng@huoxian.cn
  **/
 public class DebugExecutor extends DefaultRunExecutor {
 
