@@ -24,6 +24,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -169,6 +170,8 @@ public class TaintConfigDialog extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
+                String selected = (String) taintSourceComboBox.getSelectedItem();
+                if (selected!=null&&!("请选择污点来源".equals(selected))){
                 JPanel jPanel = new JPanel(new FlowLayout());
                 jPanel.setVisible(true);
                 taintSourceAddPanel.add(jPanel);
@@ -177,8 +180,13 @@ public class TaintConfigDialog extends JDialog {
                 taintSourceAddComboBox2 = new JComboBox<>();
                 taintSourceAddComboBox1.addItem("和");
                 taintSourceAddComboBox1.addItem("或");
-                taintSourceAddComboBox2.addItem("对象");
-                taintSourceAddComboBox2.addItem("返回值");
+                ArrayList sourceORList = getSourceOR();
+                if (!sourceORList.contains("对象")){
+                    taintSourceAddComboBox2.addItem("对象");
+                }
+                if (!sourceORList.contains("返回值")){
+                    taintSourceAddComboBox2.addItem("返回值");
+                }
                 taintSourceAddComboBox2.addItem("参数");
                 taintSourceAddTextField = new JTextField("参数编号");
                 taintSourceAddTextField.setToolTipText("参数编号，从\"1\"开始");
@@ -211,6 +219,11 @@ public class TaintConfigDialog extends JDialog {
                 jPanel.add(taintSourceAddTextField);
                 pa();
             }
+                else{
+                    new MsgTPDialog(TaintConfigDialog.this,"HOOK规则提示", true, "Sorry! "+" 请先填写第一列，请重配置HOOK规则");
+                    return;
+                }
+            }
         });
         taintSourceTextField.addMouseListener(new MouseAdapter() {
             @Override
@@ -227,8 +240,11 @@ public class TaintConfigDialog extends JDialog {
                     taintSourceAddPanel.remove(i - 1);
                 }catch (Exception ignored){
                 }
-                i = i - 1;
                 pa();
+                if (i>=0){
+                    i = i - 1;
+                }
+
             }
         });
         taintGoCombobox.addActionListener(e -> {
@@ -250,22 +266,29 @@ public class TaintConfigDialog extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
+                String selected = taintGoCombobox.getSelectedItem()+"";
+                if (selected!=null&&!("请选择污点去向").equals(selected)){
                 JPanel jPanel = new JPanel(new FlowLayout());
                 jPanel.setVisible(true);
                 taintGoAddPanel.add(jPanel);
                 j++;
                 taintGoAddComboBox1 = new JComboBox<>();
                 taintGoAddComboBox2 = new JComboBox<>();
+                ArrayList goORList = getGoOR();
                 taintGoAddComboBox1.addItem("和");
                 taintGoAddComboBox1.addItem("或");
-                taintGoAddComboBox2.addItem("对象");
-                taintGoAddComboBox2.addItem("返回值");
+                if (!goORList.contains("对象")){
+                    taintGoAddComboBox2.addItem("对象");
+                }
+                if (!goORList.contains("返回值")){
+                    taintGoAddComboBox2.addItem("返回值");
+                }
                 taintGoAddComboBox2.addItem("参数");
                 taintGoAddTextField = new JTextField("参数编号");
                 taintGoAddTextField.setToolTipText("参数编号，从\"1\"开始");
                 taintGoAddTextField.setVisible(false);
                 taintGoAddComboBox2.addActionListener(ex -> {
-                    String selectedItem = (String) taintGoAddComboBox2.getSelectedItem();
+                    String selectedItem =  taintGoAddComboBox2.getSelectedItem()+"";
                     if (TaintConstant.SOURCE_TYPE_OBJECT.equals(selectedItem)) {
                         taintGoAddTextField.setVisible(false);
                     } else if (TaintConstant.SOURCE_TYPE_RETURN.equals(selectedItem)) {
@@ -291,6 +314,11 @@ public class TaintConfigDialog extends JDialog {
                 jPanel.add(taintGoAddComboBox2);
                 jPanel.add(taintGoAddTextField);
                 pa();
+            }else{
+                    new MsgTPDialog(TaintConfigDialog.this,"HOOK规则提示", true, "Sorry! "+" 请先填写第一列，请重配置HOOK规则");
+                    return;
+                }
+
             }
         });
         taintGoTextField.addMouseListener(new MouseAdapter() {
@@ -308,8 +336,11 @@ public class TaintConfigDialog extends JDialog {
                     taintGoAddPanel.remove(j - 1);
                 }catch (Exception ignored){
                 }
-                j = j - 1;
                 pa();
+                if (j>=0){
+                    j = j - 1;
+                }
+
             }
         });
         buttonOk.addActionListener(e -> {
@@ -403,6 +434,7 @@ public class TaintConfigDialog extends JDialog {
                                             return;
                                         }
                                     }
+
                                 }
                             }
                         }
@@ -544,5 +576,54 @@ public class TaintConfigDialog extends JDialog {
         taintGoAddComboBox1.setVisible(true);
         taintGoAddComboBox2.setVisible(true);
     }
-
+    public ArrayList getSourceOR(){
+        ArrayList sourceORList = new ArrayList<>();
+        String selectedItem = (String) taintSourceComboBox.getSelectedItem();
+        if (TaintConstant.SOURCE_TYPE_OBJECT.equals(selectedItem)) {
+            if (!sourceORList.contains(selectedItem)){
+                sourceORList.add(TaintConstant.SOURCE_TYPE_OBJECT);
+            }
+        }
+        if (TaintConstant.SOURCE_TYPE_RETURN.equals(selectedItem)) {
+            if (!sourceORList.contains(selectedItem)){
+                sourceORList.add(TaintConstant.SOURCE_TYPE_RETURN);
+            }
+        }
+        if (i>0){
+            for (int k = 0; k <i-1; k++) {
+                JPanel component = (JPanel) taintSourceAddPanel.getComponent(k);
+                JComboBox<String> wdly2 = (JComboBox<String>) component.getComponent(1);
+                String wdly = (String) wdly2.getSelectedItem();
+                if (!sourceORList.contains(wdly)) {
+                    sourceORList.add(wdly);
+                }
+            }
+        }
+        return sourceORList;
+    }
+    public  ArrayList getGoOR(){
+        ArrayList  goORList = new ArrayList<>();
+        String selectedItem = (String) taintGoCombobox.getSelectedItem();
+        if (TaintConstant.SOURCE_TYPE_OBJECT.equals(selectedItem)) {
+            if (!goORList.contains(selectedItem)){
+                goORList.add(TaintConstant.SOURCE_TYPE_OBJECT);
+            }
+        }
+        if (TaintConstant.SOURCE_TYPE_RETURN.equals(selectedItem)) {
+            if (!goORList.contains(selectedItem)){
+                goORList.add(TaintConstant.SOURCE_TYPE_RETURN);
+            }
+        }
+        if (j>0){
+            for (int k = 0; k <j-1; k++) {
+                JPanel component = (JPanel) taintGoAddPanel.getComponent(k);
+                JComboBox<String> wdly2 = (JComboBox<String>) component.getComponent(1);
+                String wdly = (String) wdly2.getSelectedItem();
+                if (!goORList.contains(wdly)) {
+                    goORList.add(wdly);
+                }
+            }
+        }
+return  goORList;
+    }
 }

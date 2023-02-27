@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -129,6 +130,8 @@ public class TaintConfigDialogAdd extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
+                String select=(String) taintSourceComboBox.getSelectedItem();
+                if (select!=null&& !"请选择污点来源".equals(select)){
                 JPanel jPanel = new JPanel(new FlowLayout());
                 jPanel.setVisible(true);
                 taintSourceAddPanel.add(jPanel);
@@ -137,8 +140,13 @@ public class TaintConfigDialogAdd extends JDialog {
                 taintSourceAddComboBox2 = new JComboBox<>();
                 taintSourceAddComboBox1.addItem("和");
                 taintSourceAddComboBox1.addItem("或");
-                taintSourceAddComboBox2.addItem("对象");
-                taintSourceAddComboBox2.addItem("返回值");
+                ArrayList sourceOR = getSourceOR();
+                if (!sourceOR.contains("对象")){
+                    taintSourceAddComboBox2.addItem("对象");
+                }
+                if (!sourceOR.contains("返回值")){
+                    taintSourceAddComboBox2.addItem("返回值");
+                }
                 taintSourceAddComboBox2.addItem("参数");
                 taintSourceAddTextField = new JTextField("参数编号");
                 taintSourceAddTextField.setToolTipText("参数编号，从\"1\"开始");
@@ -171,6 +179,11 @@ public class TaintConfigDialogAdd extends JDialog {
                 jPanel.add(taintSourceAddComboBox2);
                 jPanel.add(taintSourceAddTextField);
                 pa();
+            }
+                else{
+                    new MsgTPDialog(TaintConfigDialogAdd.this,"HOOK规则提示", true, "Sorry! "+" 请先填写第一列，请重配置HOOK规则");
+                    return;
+                }
             }
         });
         taintSourceDelLabel.addMouseListener(new MouseAdapter() {
@@ -364,5 +377,30 @@ public class TaintConfigDialogAdd extends JDialog {
             String content = "请求未发送成功，请检查 DongTai IAST自定义规则 中的配置是否正确！";
             notificationError(content);
         }
+    }
+    public ArrayList getSourceOR(){
+        ArrayList sourceORList = new ArrayList<>();
+        String selectedItem = (String) taintSourceComboBox.getSelectedItem();
+        if (TaintConstant.SOURCE_TYPE_OBJECT.equals(selectedItem)) {
+            if (!sourceORList.contains(selectedItem)){
+                sourceORList.add(TaintConstant.SOURCE_TYPE_OBJECT);
+            }
+        }
+        if (TaintConstant.SOURCE_TYPE_RETURN.equals(selectedItem)) {
+            if (!sourceORList.contains(selectedItem)){
+                sourceORList.add(TaintConstant.SOURCE_TYPE_RETURN);
+            }
+        }
+        if (i>0){
+            for (int k = 0; k <i-1; k++) {
+                JPanel component = (JPanel) taintSourceAddPanel.getComponent(k);
+                JComboBox<String> wdly2 = (JComboBox<String>) component.getComponent(1);
+                String wdly = (String) wdly2.getSelectedItem();
+                if (!sourceORList.contains(wdly)) {
+                    sourceORList.add(wdly);
+                }
+            }
+        }
+        return sourceORList;
     }
 }
