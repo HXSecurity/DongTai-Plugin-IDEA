@@ -6,9 +6,10 @@
       <GradleProjectSettings>
         <option name="delegatedBuild" value="true" />
         <option name="testRunner" value="GRADLE" />
-        <option name="distributionType" value="WRAPPED" />
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="/usr/local/Cellar/gradle/7.1/libexec" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../gradle-7.6" />
+        <option name="gradleJvm" value="11 (2)" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
