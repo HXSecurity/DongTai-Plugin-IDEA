@@ -1,6 +1,7 @@
 package cn.huoxian.dongtai.plugin.dialog;
 
 import cn.huoxian.dongtai.plugin.util.TaintConstant;
+import cn.huoxian.dongtai.plugin.util.TaintUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -17,15 +18,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Logger;
 
-import static cn.huoxian.dongtai.plugin.util.TaintUtil.config;
-import static cn.huoxian.dongtai.plugin.util.TaintUtil.notificationError;
+import static cn.huoxian.dongtai.plugin.util.TaintUtil.*;
 
 /**
  * @author niuerzhuang@huoxian.cn
  */
 public class TaintConfigDialogAdd extends JDialog {
+    private static final Logger logger = Logger.getLogger(TaintConfigDialogAdd.class.getName());
     private JPanel contentPane;
     private JButton buttonOk;
     private JButton buttonCancel;
@@ -58,6 +63,14 @@ public class TaintConfigDialogAdd extends JDialog {
     private String url;
     private String token;
     private final JSONObject json = new JSONObject();
+    public  static HashMap<String, String> verifyMap = new HashMap<>();
+    static {
+        verifyMap.put("rule_type_id","规则类型");
+        verifyMap.put("rule_value","规则详情");
+        verifyMap.put("rule_source","污点来源");
+        verifyMap.put("inherit","继承深度");
+        verifyMap.put("track","污点追踪");
+    }
 
     public TaintConfigDialogAdd(String methodSignature, String classKind, Map<String, Integer> map) {
         setContentPane(contentPane);
@@ -117,6 +130,8 @@ public class TaintConfigDialogAdd extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
+                String select=(String) taintSourceComboBox.getSelectedItem();
+                if (select!=null&& !"请选择污点来源".equals(select)){
                 JPanel jPanel = new JPanel(new FlowLayout());
                 jPanel.setVisible(true);
                 taintSourceAddPanel.add(jPanel);
@@ -125,8 +140,13 @@ public class TaintConfigDialogAdd extends JDialog {
                 taintSourceAddComboBox2 = new JComboBox<>();
                 taintSourceAddComboBox1.addItem("和");
                 taintSourceAddComboBox1.addItem("或");
-                taintSourceAddComboBox2.addItem("对象");
-                taintSourceAddComboBox2.addItem("返回值");
+                ArrayList sourceOR = getSourceOR();
+                if (!sourceOR.contains("对象")){
+                    taintSourceAddComboBox2.addItem("对象");
+                }
+                if (!sourceOR.contains("返回值")){
+                    taintSourceAddComboBox2.addItem("返回值");
+                }
                 taintSourceAddComboBox2.addItem("参数");
                 taintSourceAddTextField = new JTextField("参数编号");
                 taintSourceAddTextField.setToolTipText("参数编号，从\"1\"开始");
@@ -160,6 +180,11 @@ public class TaintConfigDialogAdd extends JDialog {
                 jPanel.add(taintSourceAddTextField);
                 pa();
             }
+                else{
+                    new MsgTPDialog(TaintConfigDialogAdd.this,"HOOK规则提示", true, "Sorry! "+" 请先填写第一列，请重配置HOOK规则");
+                    return;
+                }
+            }
         });
         taintSourceDelLabel.addMouseListener(new MouseAdapter() {
             @Override
@@ -179,6 +204,7 @@ public class TaintConfigDialogAdd extends JDialog {
             token = config("TOKEN");
             json.put("rule_type_id", map.get(ruleTypeComboBox.getSelectedItem()));
             json.put("rule_value", methodSignature);
+            json.put("language_id","1");
             StringBuilder s1 = new StringBuilder();
             String selectedItem = (String) taintSourceComboBox.getSelectedItem();
             if (TaintConstant.SOURCE_TYPE_OBJECT.equals(selectedItem)) {
@@ -213,6 +239,51 @@ public class TaintConfigDialogAdd extends JDialog {
                 json.put("inherit", "all");
             }
             json.put("rule_target", "");
+            //规则校验
+            Iterator iter = json.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry entry = (Map.Entry) iter.next();
+                //有参数
+                if (entry.getKey().equals("rule_source")){
+                  if (entry.getValue()==null||("").equals(entry.getValue())){
+                          new MsgTPDialog(TaintConfigDialogAdd.this,"HOOK规则提示", true, "Sorry! "+verifyMap.get(entry.getKey())+" 必须填写，请重配置HOOK规则");
+                          return;
+                    }
+                  else {
+                      String parmeter = entry.getValue().toString();
+                      if (parmeter.contains("P")){
+                          //方便切片分割替换
+                          String parm = parmeter.replaceAll("\\|", "&");
+                          String[] split = parm.split("&");
+                          for (String s : split) {
+                              if (s.startsWith("P")){
+                                  if(s.length()%2==1){
+                                      new MsgTPDialog(TaintConfigDialogAdd.this,"HOOK规则提示", true, "Sorry! "+verifyMap.get(entry.getKey())+"的参数编号"+" 必须填写，请重配置HOOK规则");
+                                      return;
+                                  }
+                                  else{
+                                      String p = s.substring(s.indexOf("P") + 1);
+                                      if (!isNumeric(p.substring(p.indexOf("P")+1))){
+                                          new MsgTPDialog(TaintConfigDialogAdd.this,"HOOK规则提示", true, "Sorry! "+verifyMap.get(entry.getKey())+"的参数编号"+p+" 不是数字，请重配置HOOK规则");
+                                          return;
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+                }
+                //无参数
+                else{
+                    if (entry.getValue()==null||("").equals(entry.getValue())){
+                        if (verifyMap.containsKey(entry.getKey())){
+                            new MsgTPDialog(TaintConfigDialogAdd.this,"HOOK规则提示", true, "Sorry! "+verifyMap.get(entry.getKey())+" 必须填写，请重配置HOOK规则");
+                            return;
+                        }
+                    }
+                }
+
+            }
             requestJson(url + TaintConstant.RULESET_API_RULE_ADD);
             onOk();
         });
@@ -294,13 +365,42 @@ public class TaintConfigDialogAdd extends JDialog {
             }
             reader.close();
             JSONObject jsonObject = JSONObject.parseObject(document.toString());
-            String parameter = (String) jsonObject.get("status");
-            if (TaintConstant.REQUEST_JSON_ERROR_STATUS.equals(parameter)) {
+            TaintUtil.infoToIdeaDubug("发送规则请求："+url+"--->"+jsonObject);
+            logger.info(jsonObject.toString());
+            String parameter = String.valueOf(jsonObject.get("status"));
+            if (TaintConstant.REQUEST_JSON_SUCCESS_STATUS.equals(parameter)) {
+                notificationInfo(TaintConstant.NOTIFICATION_CONTENT_INFO_SUCCESS);
+            }else{
                 notificationError(TaintConstant.NOTIFICATION_CONTENT_ERROR_COMPLETE);
             }
         } catch (IOException e1) {
             String content = "请求未发送成功，请检查 DongTai IAST自定义规则 中的配置是否正确！";
             notificationError(content);
         }
+    }
+    public ArrayList getSourceOR(){
+        ArrayList sourceORList = new ArrayList<>();
+        String selectedItem = (String) taintSourceComboBox.getSelectedItem();
+        if (TaintConstant.SOURCE_TYPE_OBJECT.equals(selectedItem)) {
+            if (!sourceORList.contains(selectedItem)){
+                sourceORList.add(TaintConstant.SOURCE_TYPE_OBJECT);
+            }
+        }
+        if (TaintConstant.SOURCE_TYPE_RETURN.equals(selectedItem)) {
+            if (!sourceORList.contains(selectedItem)){
+                sourceORList.add(TaintConstant.SOURCE_TYPE_RETURN);
+            }
+        }
+        if (i>0){
+            for (int k = 0; k <i-1; k++) {
+                JPanel component = (JPanel) taintSourceAddPanel.getComponent(k);
+                JComboBox<String> wdly2 = (JComboBox<String>) component.getComponent(1);
+                String wdly = (String) wdly2.getSelectedItem();
+                if (!sourceORList.contains(wdly)) {
+                    sourceORList.add(wdly);
+                }
+            }
+        }
+        return sourceORList;
     }
 }

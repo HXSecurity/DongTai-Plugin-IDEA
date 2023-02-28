@@ -22,8 +22,10 @@ public interface TaintConstant {
     String TAINTS_COUNT_API_GET = "/api/v1/plugin/vuln/count";
 
     String CONFIG_FILENAME_WINDOWS = PROPERTY + "/Library/iastagent/DongTaiConfig.properties";
+    String JAR_FILENAME_WINDOWS = PROPERTY + "/Library/iastagent/agent.jar";
 
     String CONFIG_FILENAME_MAC = "/Library/iastagent/DongTaiConfig.properties";
+    String JAR_FILENAME_MAC = "/Library/iastagent/agent.jar";
 
     String RULE_STAIN_SOURCE = "污点源方法规则";
 
@@ -55,36 +57,37 @@ public interface TaintConstant {
 
     String NOTIFICATION_CONTENT_WARNING_METHOD = "您需要选择一个方法的方法名！";
 
-    String NOTIFICATION_CONTENT_INFO_SUCCESS = "请求发送成功";
+    String NOTIFICATION_CONTENT_INFO_SUCCESS = "请求发送成功,策略规则创建成功";
 
     String AGENT_NAME = "agent.jar";
 
     String URL = TaintUtil.fixUrl();
 
-    String AGENT_URL = URL + "/api/v1/agent/download?url=" + URL + "&language=java";
+    String AGENT_URL = URL + "/api/v1/agent/download?url=" + URL+"/openapi" + "&language=java";
 
     String AGENT_PATH_MAC = PROPERTY + "/Library/iastagent/";
 
     String AGENT_PATH_WINDOWS = PROPERTY + "/Library/iastagent/";
 
-    String DEFAULT_URL = "https://iast.huoxian.cn";
 
-    String DEFAULT_AGENT_URL = "http://openapi.iast.huoxian.cn:8000";
 
-    String AGENT_CONFIG_PATH_MAC = AGENT_PATH_MAC + "config/iast.properties";
-
-    String AGENT_CONFIG_PATH_WINDOWS = AGENT_PATH_WINDOWS + "config/iast.properties";
-
-    String AGENT_VERSION_VALUE = "v1.0.0";
+ /*   String AGENT_CONFIG_PATH_MAC = PROPERTY +"/AppData/Local/Temp/"+ "dongtai-"+System.getenv().get("USERNAME")+"/v"+ AgentMassage.getVersion()+"/iast.properties";
+    String AGENT_CONFIG_PATH_WINDOWS = PROPERTY +"/AppData/Local/Temp/"+ "dongtai-"+System.getenv().get("USERNAME")+"/v" + AgentMassage.getVersion()+"/iast.properties";*/
 
     String[] COLUMN_NAME = {"url", "漏洞类型", "等级", "source点", "sink点"};
 
     DefaultTableModel TABLE_MODEL = new DefaultTableModel(null, COLUMN_NAME);
 
-    String TAINT_DETAIL = "https://iast.huoxian.cn/vuln/vulnDetail/1/";
+    String TAINT_DETAIL = "/vuln/vulnDetail/1/";
 
     String AGENT_PATH = TaintUtil.os();
 
     String REQUEST_JSON_ERROR_STATUS = "202";
+    String REQUEST_JSON_SUCCESS_STATUS = "201";
+    String TOKEN="1f6b147d1790d2226e49ae6b822d83f2f911b55b";
+    String LOGLEVEL="info";
+    String OPENAPITOKEN="1f6b147d1790d2226e49ae6b822d83f2f911b55b";
+    String DEFAULT_URL = "https://iast-test.huoxian.cn";
+    String DEFAULT_AGENT_URL = "https://iast-test.huoxian.cn";
 
 }

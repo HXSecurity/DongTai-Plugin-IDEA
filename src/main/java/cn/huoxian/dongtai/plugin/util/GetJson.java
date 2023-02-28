@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Logger;
 
 import static cn.huoxian.dongtai.plugin.util.TaintUtil.config;
 
@@ -22,10 +23,14 @@ import static cn.huoxian.dongtai.plugin.util.TaintUtil.config;
  * @author niuerzhuang@huoxian.cn
  **/
 public class GetJson {
+
+    private static final Logger logger = Logger.getLogger(GetJson.class.getName());
+
     /**
      * 获取规则集的 Json 字符串
      */
     public static String getRuleJson(int type) {
+
         String dongTaiUrlStr = config("URL") + TaintConstant.RULESET_API_RULE_TYPE + type;
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(dongTaiUrlStr);
@@ -44,6 +49,7 @@ public class GetJson {
             }
             reader.close();
             JSONObject jsonObject = JSONObject.parseObject(document.toString());
+            TaintUtil.infoToIdeaDubug("taintsAPI"+dongTaiUrlStr+"----->"+jsonObject.toJSONString());
             return jsonObject.toJSONString();
         } catch (IOException ignore) {
         }
@@ -54,7 +60,17 @@ public class GetJson {
         try {
             String utf8 = "UTF-8";
             String agentName = URLEncoder.encode(AgentMassage.getAgentToken(), utf8);
-            String taintsAPI = config("URL") + TaintConstant.TAINTS_API_GET + "?name=" + agentName;
+            agentName=agentName.replaceAll("\\+",  "%20"); //处理空格
+            if (ConfigUtil.env==null){
+                return "";
+            }
+            String projectname=ConfigUtil.projectName;;
+            String departmenttoken=ConfigUtil.getOpenApiToken();
+            String taintsAPI = config("URL") + TaintConstant.TAINTS_API_GET +
+                    "?name=" + agentName+
+                    "&departmenttoken="+departmenttoken+
+                    "&projectname="+projectname;
+
             CloseableHttpClient client = HttpClients.createDefault();
             HttpGet get = new HttpGet(taintsAPI);
             RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(1000).setConnectTimeout(1000).build();
@@ -68,6 +84,8 @@ public class GetJson {
             String line;
             while ((line = reader.readLine()) != null) {
                 document.append(line);
+                logger.info("taintsAPI"+taintsAPI+"-----/api/v1/plugin/vuln/list"+line);
+                TaintUtil.infoToIdeaDubug("taintsAPI"+taintsAPI+"-----/api/v1/plugin/vuln/list"+line);
             }
             reader.close();
             return document.toString();
@@ -80,7 +98,14 @@ public class GetJson {
         try {
             String utf8 = "UTF-8";
             String agentName = URLEncoder.encode(AgentMassage.getAgentToken(), utf8);
-            String taintsAPI = config("URL") + TaintConstant.TAINTS_COUNT_API_GET + "?name=" + agentName;
+            agentName=agentName.replaceAll("\\+",  "%20"); //处理空格
+            String projectname=ConfigUtil.projectName;
+            String departmenttoken=ConfigUtil.getOpenApiToken();
+
+            String taintsAPI = config("URL") + TaintConstant.TAINTS_COUNT_API_GET +
+                    "?name=" + agentName+
+                    "&departmenttoken="+departmenttoken+
+                    "&projectname="+projectname;
             CloseableHttpClient client = HttpClients.createDefault();
             HttpGet get = new HttpGet(taintsAPI);
             RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(1000).setConnectTimeout(1000).build();
@@ -94,6 +119,8 @@ public class GetJson {
             String line;
             while ((line = reader.readLine()) != null) {
                 document.append(line);
+                logger.info("taintsAPI"+taintsAPI+"-----/api/v1/plugin/vuln/count"+line);
+                TaintUtil.infoToIdeaDubug("taintsAPI"+taintsAPI+"-----/api/v1/plugin/vuln/count"+line);
             }
             reader.close();
             return document.toString();
