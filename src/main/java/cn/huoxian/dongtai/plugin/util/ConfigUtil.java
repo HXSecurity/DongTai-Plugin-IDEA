@@ -121,7 +121,8 @@ public class ConfigUtil {
             r_version = version;
         }
         else {
-            r_version = VMProperties.get("project.version");
+            r_version = "v1.0";
+            TaintUtil.notificationWarning("未在配置中指定项目版本，当前使用默认版本v1.0");
         }
         ConfigUtil.projectVersion = r_version;
         logger.info("Return Project Version" + r_version);
