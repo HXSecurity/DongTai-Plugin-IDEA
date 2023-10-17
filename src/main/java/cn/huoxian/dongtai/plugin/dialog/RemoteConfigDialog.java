@@ -23,6 +23,7 @@ public class RemoteConfigDialog extends JDialog {
     private JTextField serverTokenTextArea;
     private JTextField agentUrl;
     private JComboBox logLevelcomboBox;
+    private JTextField projectVersionTextArea;
     private JTextField projectNameTextArea;
     public static boolean isNewToken = false;
     public static boolean isNewTokenToProject = false;
@@ -60,6 +61,11 @@ public class RemoteConfigDialog extends JDialog {
         if (logLevel != null &&!"".equals(logLevel)) {
             logLevelcomboBox.setSelectedItem(logLevel);
         }
+        // UzzJu.com
+        String projectVersion = properties.getProperty("PROJECTVERSION");
+        if (logLevel != null &&!"".equals(projectVersion)) {
+            logLevelcomboBox.setSelectedItem(projectVersion);
+        }
         buttonOK.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -67,6 +73,7 @@ public class RemoteConfigDialog extends JDialog {
                 String openApitoken = openApiTokenTextArea.getText();
                 String url = agentUrl.getText();
                 String projectName = projectNameTextArea.getText();
+                String projectVersion = projectVersionTextArea.getText();
                 if (serverToken==null||serverToken.equals("")){
                     TaintUtil.notificationWarning("serverToker不能为空，请重配置IAST云端！");
                     new MsgTPDialog(remoteConfigDialog, "IAST云端提示", true, "Sorry! serverToker必须填写，请重配置IAST云端！!");
@@ -87,6 +94,7 @@ public class RemoteConfigDialog extends JDialog {
                 remoteConfig.put("TOKEN", serverToken);
                 remoteConfig.put("OPENAPITOKEN", openApitoken);
                 remoteConfig.put("PROJECTNAME", projectName);
+                remoteConfig.put("PROJECTVERSION", projectVersion);
                 String logLevel = String.valueOf(logLevelcomboBox.getSelectedItem());
                 if (!logLevel.equals("请选择等级类型")){
                     remoteConfig.put("LOGLEVEL", logLevel);

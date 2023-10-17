@@ -55,9 +55,10 @@ public class RunCodeRunner extends DefaultJavaProgramRunner {
         parametersList.add("-Ddongtai.server.token=" +ConfigUtil.getOpenApiToken() );
         parametersList.add("-Ddongtai.log.level="+ConfigUtil.getLoglevel());
         parametersList.add("-Ddongtai.server.url=" +ConfigUtil.getURL());
+        parametersList.add("-Ddongtai.app.version=" +ConfigUtil.getProjectVersion());
         ConfigUtil.env=env;
-        logger.info("IDEA"+ConfigUtil.getRunerIdeaVersion()+"Run With IAST 启动项目："   +ConfigUtil.projectName);
-        TaintUtil.notificationWarning("IDEA："+ConfigUtil.getRunerIdeaVersion()+"Run With IAST 启动项目："   +ConfigUtil.projectName);
+        logger.info("IDEA"+ConfigUtil.getRunerIdeaVersion()+"Run With IAST 启动项目："   +ConfigUtil.projectName + "项目版本: " + ConfigUtil.projectVersion);
+        TaintUtil.notificationWarning("IDEA："+ConfigUtil.getRunerIdeaVersion()+"Run With IAST 启动项目："   +ConfigUtil.projectName + "项目版本: " + ConfigUtil.projectVersion);
         RunContentDescriptor runContentDescriptor=null;
         try {
             runContentDescriptor = super.doExecute(state, env);
@@ -81,9 +82,10 @@ public class RunCodeRunner extends DefaultJavaProgramRunner {
         parametersList.add("-Ddongtai.server.token=" +ConfigUtil.getOpenApiToken() );
         parametersList.add("-Ddongtai.log.level="+ConfigUtil.getLoglevel());
         parametersList.add("-Ddongtai.server.url=" +ConfigUtil.getURL());
+        parametersList.add("-Ddongtai.app.version=" +ConfigUtil.getProjectVersion());
         ConfigUtil.env=env;
-        logger.info("IDEA"+ConfigUtil.getRunerIdeaVersion()+"Run With IAST 启动项目："   +ConfigUtil.projectName);
-        TaintUtil.notificationWarning("IDEA："+ConfigUtil.getRunerIdeaVersion()+"Run With IAST 启动项目："   +ConfigUtil.projectName);
+        logger.info("IDEA"+ConfigUtil.getRunerIdeaVersion()+"Run With IAST 启动项目："   +ConfigUtil.projectName + "项目版本: " + ConfigUtil.projectVersion);
+        TaintUtil.notificationWarning("IDEA："+ConfigUtil.getRunerIdeaVersion()+"Run With IAST 启动项目："   +ConfigUtil.projectName + "项目版本: " + ConfigUtil.projectVersion);
         Promise  promise =null;
         try {
             promise = super.doExecuteAsync(state, env);

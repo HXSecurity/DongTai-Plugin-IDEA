@@ -56,6 +56,8 @@ public class ConfigUtil {
     }
     public  static ExecutionEnvironment env;
     public  static String projectName;
+
+    public static String projectVersion;
     public  static String getOpenApiToken(){
         String token = VMProperties.get("dongtai.server.token");
         if (!("").equals(token)&&token!=null){
@@ -111,7 +113,22 @@ public class ConfigUtil {
         }
         return level;
     }
-    public  static String getProjectName(ExecutionEnvironment env, JavaParameters parametersList){
+    public static String getProjectVersion(){
+        String r_version;
+        String version = TaintUtil.config("PROJECTVERSION");
+        logger.info("Get Project Version: " + version);
+        if (!("").equals(version)&&version!=null){
+            r_version = version;
+        }
+        else {
+            r_version = VMProperties.get("project.version");
+        }
+        ConfigUtil.projectVersion = r_version;
+        logger.info("Return Project Version" + r_version);
+        System.out.println("Get Project Version: " + r_version);
+        return r_version;
+    }
+    public static String getProjectName(ExecutionEnvironment env, JavaParameters parametersList){
         String projectName =env.getProject().getName();
         //todo 不兼容的版本
         if (!isNormal()){
